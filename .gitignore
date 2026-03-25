@@ -25,3 +25,6 @@ dist-ssr
 *RunTracker.jsx
 mobiledev-web/src/components/ChatUI.jsx
 mobiledev-web/src/components/mobile-prompt-generator.jsx
+*.claude
+*.env
+*.example

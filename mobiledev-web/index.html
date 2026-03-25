@@ -4,7 +4,11 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>gpt-mobiledev</title>
+    <title>Humble-UI</title>
+    <!-- CSP is set via HTTP headers (vite.config.js in dev, vercel.json/public/_headers in prod).  -->
+    <!-- The meta tag approach is intentionally NOT used: Vite HMR needs inline scripts in dev,   -->
+    <!-- and browsers silently ignore frame-ancestors in meta tags anyway.                         -->
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
   </head>
   <body>
     <div id="root"></div>

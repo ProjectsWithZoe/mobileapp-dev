@@ -1,4 +1,12 @@
-import { useState, useCallback, useMemo } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
+import { useAuth } from "../hooks/useAuth";
+import { useSavedPrompts } from "../hooks/useSavedPrompts";
+import { useProfile } from "../hooks/useProfile";
+import { isSupabaseConfigured } from "../lib/supabase";
+import { capture } from "../lib/posthog";
+import { getStripeLink } from "../lib/stripe";
+import AuthModal from "./AuthModal";
+import SavedPrompts from "./SavedPrompts";
 
 // ─── CONSTANTS ───────────────────────────────────────────────────────────────
 
@@ -411,31 +419,123 @@ export default function PromptGenerator() {
   const [copied, setCopied] = useState(false);
   const [promptGenerated, setPromptGenerated] = useState(false);
 
+  // Auth & save state
+  const { user, loading: authLoading, signIn, signOut } = useAuth();
+  const { prompts, loading: promptsLoading, savePrompt, deletePrompt } = useSavedPrompts(user?.id);
+  const { isPaid, withinLimit, generationsUsed, incrementGeneration, refresh: refreshProfile } = useProfile(user?.id);
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+  const [showContactModal, setShowContactModal] = useState(false);
+  const [contactForm, setContactForm] = useState({ name: "", email: "", message: "" });
+  const [contactStatus, setContactStatus] = useState("idle");
+  const [paymentBanner, setPaymentBanner] = useState(null);
+
+  // Handle ?payment=success redirect from Stripe
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("payment") !== "success") return;
+    setPaymentBanner("pending");
+    history.replaceState(null, "", window.location.pathname);
+    let attempts = 0;
+    const interval = setInterval(async () => {
+      attempts++;
+      const latest = await refreshProfile();
+      const paid = latest?.plan === "monthly" || latest?.plan === "lifetime";
+      if (paid || attempts >= 10) {
+        clearInterval(interval);
+        setPaymentBanner(paid ? "done" : null);
+        if (paid) setTimeout(() => setPaymentBanner(null), 4000);
+      }
+    }, 2000);
+    return () => clearInterval(interval);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const [showSaveInput, setShowSaveInput] = useState(false);
+  const [saveName, setSaveName] = useState("");
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState("");
+  const saveInputRef = useRef(null);
+
+  const handleSaveClick = useCallback(() => {
+    if (!user) { setShowAuthModal(true); return; }
+    setSaveName(appIdea.slice(0, 60));
+    setSaveError("");
+    setShowSaveInput(true);
+    setTimeout(() => saveInputRef.current?.focus(), 50);
+  }, [user, appIdea]);
+
+  const handleSaveConfirm = useCallback(async () => {
+    if (!saveName.trim()) return;
+    setSaving(true);
+    setSaveError("");
+    try {
+      await savePrompt({
+        name: saveName.trim(),
+        app_idea: appIdea,
+        use_case: selectedUseCase,
+        palette_index: selectedPalette,
+        complexity: selectedComplexity,
+        extra_context: extraContext,
+        prompt_text: generatedPrompt,
+      });
+      setShowSaveInput(false);
+      capture("prompt_saved", { use_case: selectedUseCase, complexity: selectedComplexity });
+    } catch {
+      setSaveError("Save failed. Please try again.");
+    } finally {
+      setSaving(false);
+    }
+  }, [saveName, appIdea, selectedUseCase, selectedPalette, selectedComplexity, extraContext, generatedPrompt, savePrompt]);
+
+  const handleLoad = useCallback((saved) => {
+    setAppIdea(saved.app_idea);
+    setSelectedUseCase(saved.use_case);
+    setSelectedPalette(saved.palette_index);
+    setSelectedComplexity(saved.complexity);
+    setExtraContext(saved.extra_context ?? "");
+    setGeneratedPrompt(saved.prompt_text);
+    setPromptGenerated(true);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, []);
+
   const palette = COLOR_PALETTES[selectedPalette];
   const complexity = COMPLEXITY_LEVELS.find((c) => c.id === selectedComplexity);
   const styleTokens = STYLE_TOKENS_BY_USECASE[selectedUseCase] || STYLE_TOKENS_BY_USECASE.mobile;
-
   const canGenerate = appIdea.trim().length > 0;
+  const charCount = generatedPrompt.length;
 
-  const generatePrompt = useCallback(() => {
+  const generatePrompt = useCallback(async () => {
     if (!canGenerate) return;
+    if (!withinLimit) { setShowUpgradeModal(true); return; }
     const randomStyles = [...styleTokens].sort(() => Math.random() - 0.5).slice(0, 5);
     const builder = PROMPT_BUILDERS[selectedUseCase];
     const prompt = builder({ appIdea, palette, styles: randomStyles, complexity, extraContext });
     setGeneratedPrompt(prompt);
     setPromptGenerated(true);
-  }, [appIdea, selectedUseCase, palette, complexity, styleTokens, extraContext, canGenerate]);
+    capture("prompt_generated", {
+      use_case: selectedUseCase,
+      complexity: selectedComplexity,
+      palette: palette.name,
+    });
+    await incrementGeneration();
+  }, [appIdea, selectedUseCase, selectedComplexity, palette, complexity, styleTokens, extraContext, canGenerate, withinLimit, incrementGeneration]);
 
   const copyToClipboard = useCallback(() => {
     navigator.clipboard.writeText(generatedPrompt);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
-  }, [generatedPrompt]);
-
-  const charCount = useMemo(() => generatedPrompt.length, [generatedPrompt]);
+    capture("prompt_copied", { use_case: selectedUseCase });
+  }, [generatedPrompt, selectedUseCase]);
 
   return (
     <div className="min-h-screen bg-gray-950 text-white" style={{ fontFamily: "'IBM Plex Mono', monospace" }}>
+      {/* Payment success banner */}
+      {paymentBanner && (
+        <div className="w-full px-4 py-3 text-sm font-semibold text-center" style={{ backgroundColor: paymentBanner === "done" ? "#166534" : "#14532d", color: "#86efac" }}>
+          {paymentBanner === "done" ? "✓ Plan activated! Enjoy unlimited generations." : "Payment successful! Activating your plan…"}
+        </div>
+      )}
+
       {/* Top bar */}
       <div className="border-b border-gray-800 px-6 py-3 flex items-center justify-between sticky top-0 bg-gray-950 z-10">
         <div className="flex items-center gap-3">
@@ -447,8 +547,49 @@ export default function PromptGenerator() {
           <span className="text-gray-500 text-xs">prompt-generator.jsx</span>
         </div>
         <div className="flex items-center gap-2">
-          <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
-          <span className="text-green-400 text-xs">ready</span>
+          {isSupabaseConfigured && (
+            authLoading ? (
+              <div className="w-4 h-4 rounded-full border-2 border-gray-700 border-t-gray-400 animate-spin" />
+            ) : user ? (
+              <>
+                <span className="text-gray-500 text-xs hidden sm:inline truncate max-w-[140px]">{user.email}</span>
+                {isPaid ? (
+                  <span className="text-xs px-2 py-0.5 rounded-full font-bold" style={{ backgroundColor: "#6C63FF20", color: "#6C63FF" }}>
+                    Pro
+                  </span>
+                ) : (
+                  <button
+                    onClick={() => setShowUpgradeModal(true)}
+                    className="text-xs px-2 py-0.5 rounded-full font-bold transition-colors hover:opacity-80"
+                    style={{ backgroundColor: "#1f2937", color: "#6b7280" }}
+                    title={`${generationsUsed}/1 free generation used`}
+                  >
+                    Free · {generationsUsed}/1
+                  </button>
+                )}
+                <button
+                  onClick={() => { setContactForm({ name: "", email: user?.email ?? "", message: "" }); setContactStatus("idle"); setShowContactModal(true); }}
+                  className="text-xs px-2.5 py-1 rounded-lg border border-gray-700 text-gray-400 hover:border-gray-500 hover:text-gray-200 transition-all duration-150"
+                >
+                  Contact
+                </button>
+                <button
+                  onClick={signOut}
+                  className="text-xs px-2.5 py-1 rounded-lg border border-gray-700 text-gray-400 hover:border-gray-500 hover:text-gray-200 transition-all duration-150"
+                >
+                  Sign out
+                </button>
+              </>
+            ) : (
+              <button
+                onClick={() => setShowAuthModal(true)}
+                className="text-xs px-3 py-1.5 rounded-lg font-bold transition-all duration-150 active:scale-95"
+                style={{ backgroundColor: "#6C63FF", color: "white" }}
+              >
+                Sign in
+              </button>
+            )
+          )}
         </div>
       </div>
 
@@ -457,7 +598,7 @@ export default function PromptGenerator() {
         {/* LEFT COLUMN — CONFIG */}
         <div className="space-y-7">
           <div>
-            <h1 className="text-2xl font-bold text-white leading-tight">AI Prompt Generator</h1>
+            <h1 className="text-2xl font-bold text-white leading-tight">HUmbleUI Prompt Generator</h1>
             <p className="text-gray-500 text-sm mt-1">Generate senior-level dev prompts for any use case</p>
           </div>
 
@@ -576,11 +717,13 @@ export default function PromptGenerator() {
           {/* Generate Button */}
           <button
             onClick={generatePrompt}
-            disabled={!canGenerate}
+            disabled={withinLimit && !canGenerate}
             className="w-full py-4 rounded-xl font-bold text-sm transition-all duration-200 active:scale-95 disabled:opacity-30 disabled:cursor-not-allowed"
-            style={{ backgroundColor: canGenerate ? "#6C63FF" : "#374151", color: "white" }}
+            style={{ backgroundColor: (!withinLimit || canGenerate) ? "#6C63FF" : "#374151", color: "white" }}
           >
-            {promptGenerated ? "↻ Regenerate Prompt" : "→ Generate Prompt"}
+            {!withinLimit
+              ? "🔒 Upgrade to Generate More"
+              : promptGenerated ? "↻ Regenerate Prompt" : "→ Generate Prompt"}
           </button>
         </div>
 
@@ -606,10 +749,51 @@ export default function PromptGenerator() {
                   >
                     {copied ? "✓ Copied!" : "Copy"}
                   </button>
+                  {isSupabaseConfigured && (
+                    <button
+                      onClick={handleSaveClick}
+                      className="text-xs px-3 py-1.5 rounded-lg transition-all duration-150 active:scale-95 font-bold border border-gray-700 text-gray-300 hover:border-gray-500 hover:text-white"
+                    >
+                      💾 Save
+                    </button>
+                  )}
                 </div>
               </div>
 
-              {/* Prompt preview */}
+              {/* Inline save name input */}
+              {showSaveInput && (
+                <div className="px-4 py-3 bg-gray-900 border-b border-gray-800 flex flex-col gap-2">
+                  <div className="flex items-center gap-2">
+                    <input
+                      ref={saveInputRef}
+                      type="text"
+                      value={saveName}
+                      onChange={(e) => setSaveName(e.target.value)}
+                      onKeyDown={(e) => { if (e.key === "Enter") handleSaveConfirm(); if (e.key === "Escape") setShowSaveInput(false); }}
+                      placeholder="Name this prompt…"
+                      maxLength={80}
+                      className="flex-1 bg-gray-950 border border-gray-700 rounded-lg px-3 py-1.5 text-white placeholder-gray-600 focus:outline-none focus:border-gray-500 text-xs"
+                    />
+                    <button
+                      onClick={handleSaveConfirm}
+                      disabled={saving || !saveName.trim()}
+                      className="text-xs px-3 py-1.5 rounded-lg font-bold transition-all duration-150 active:scale-95 disabled:opacity-40"
+                      style={{ backgroundColor: "#3FB950", color: "white" }}
+                    >
+                      {saving ? "…" : "Save ✓"}
+                    </button>
+                    <button
+                      onClick={() => setShowSaveInput(false)}
+                      className="text-gray-500 hover:text-gray-300 transition-colors text-sm px-1"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                  {saveError && <p className="text-xs text-red-400">{saveError}</p>}
+                </div>
+              )}
+
+              {/* Prompt content */}
               <pre className="p-5 text-xs text-gray-300 whitespace-pre-wrap leading-relaxed bg-gray-950 overflow-y-auto flex-1 max-h-[calc(100vh-200px)]">
                 {generatedPrompt}
               </pre>
@@ -617,12 +801,12 @@ export default function PromptGenerator() {
               {/* Footer hint */}
               <div className="px-4 py-2.5 bg-gray-900 border-t border-gray-800 shrink-0">
                 <p className="text-xs text-gray-600">
-                  Paste into Claude, GPT-4, or any frontier model → get production-ready code
+                  Paste into <span className="text-gray-400">Claude Code</span>, Claude.ai, or any frontier model → get production-ready code
                 </p>
               </div>
             </div>
           ) : (
-            <div className="border border-dashed border-gray-800 rounded-2xl flex-1 flex flex-col items-center justify-center p-12 text-center min-h-[400px]">
+            <div className="border border-dashed border-gray-800 rounded-2xl flex-1 flex flex-col items-center justify-center p-12 text-center">
               <div className="text-5xl mb-4">
                 {USE_CASES.find(u => u.id === selectedUseCase)?.icon || "✨"}
               </div>
@@ -643,6 +827,172 @@ export default function PromptGenerator() {
           )}
         </div>
       </div>
+
+      {/* Saved Prompts */}
+      {isSupabaseConfigured && user && (
+        <div className="max-w-5xl mx-auto px-4 pb-12 pt-2">
+          <SavedPrompts
+            prompts={prompts}
+            loading={promptsLoading}
+            onLoad={handleLoad}
+            onDelete={deletePrompt}
+          />
+        </div>
+      )}
+
+      {/* Auth modal */}
+      {showAuthModal && (
+        <AuthModal
+          onClose={() => setShowAuthModal(false)}
+          onSignIn={signIn}
+        />
+      )}
+
+      {/* Contact modal */}
+      {showContactModal && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center px-4"
+          style={{ backgroundColor: "rgba(0,0,0,0.75)", backdropFilter: "blur(4px)" }}
+          onClick={(e) => { if (e.target === e.currentTarget) setShowContactModal(false); }}
+        >
+          <div className="bg-gray-900 border border-gray-700 rounded-2xl p-8 max-w-md w-full relative">
+            <button
+              onClick={() => setShowContactModal(false)}
+              className="absolute top-4 right-4 text-gray-500 hover:text-white transition-colors text-lg leading-none"
+            >✕</button>
+
+            {contactStatus === "sent" ? (
+              <div className="text-center py-6">
+                <div className="text-3xl mb-3">✉️</div>
+                <h3 className="text-white font-bold text-lg mb-2">Message sent!</h3>
+                <p className="text-gray-400 text-sm">We'll get back to you as soon as possible.</p>
+                <button
+                  onClick={() => setShowContactModal(false)}
+                  className="mt-6 px-5 py-2 rounded-lg text-sm font-bold text-white transition-all duration-150 active:scale-95"
+                  style={{ backgroundColor: "#6C63FF" }}
+                >Close</button>
+              </div>
+            ) : (
+              <>
+                <h3 className="text-white font-bold text-lg mb-1">Contact us</h3>
+                <p className="text-gray-400 text-sm mb-6">We read every message.</p>
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-xs text-gray-500 mb-1.5">Name</label>
+                    <input
+                      type="text"
+                      value={contactForm.name}
+                      onChange={(e) => setContactForm(f => ({ ...f, name: e.target.value }))}
+                      placeholder="Your name"
+                      className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-gray-500 transition-colors"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs text-gray-500 mb-1.5">Email</label>
+                    <input
+                      type="email"
+                      value={contactForm.email}
+                      onChange={(e) => setContactForm(f => ({ ...f, email: e.target.value }))}
+                      placeholder="you@example.com"
+                      className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-gray-500 transition-colors"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs text-gray-500 mb-1.5">Message</label>
+                    <textarea
+                      value={contactForm.message}
+                      onChange={(e) => setContactForm(f => ({ ...f, message: e.target.value }))}
+                      placeholder="How can we help?"
+                      rows={4}
+                      className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-gray-500 transition-colors resize-none"
+                    />
+                  </div>
+                </div>
+                <button
+                  onClick={() => {
+                    if (!contactForm.name.trim() || !contactForm.email.trim() || !contactForm.message.trim()) return;
+                    const subject = encodeURIComponent(`Humble-UI — message from ${contactForm.name}`);
+                    const body = encodeURIComponent(`Name: ${contactForm.name}\nEmail: ${contactForm.email}\n\n${contactForm.message}`);
+                    window.location.href = `mailto:support@humble-ui.com?subject=${subject}&body=${body}`;
+                    setContactStatus("sent");
+                  }}
+                  disabled={!contactForm.name.trim() || !contactForm.email.trim() || !contactForm.message.trim()}
+                  className="mt-6 w-full py-2.5 rounded-lg font-bold text-sm text-white transition-all duration-150 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed"
+                  style={{ backgroundColor: "#6C63FF" }}
+                >
+                  Send message →
+                </button>
+              </>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Upgrade modal */}
+      {showUpgradeModal && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center px-4"
+          style={{ backgroundColor: "rgba(0,0,0,0.75)", backdropFilter: "blur(4px)" }}
+          onClick={(e) => { if (e.target === e.currentTarget) setShowUpgradeModal(false); }}
+        >
+          <div className="bg-gray-900 border border-gray-700 rounded-2xl p-8 max-w-md w-full relative">
+            <button
+              onClick={() => setShowUpgradeModal(false)}
+              className="absolute top-4 right-4 text-gray-500 hover:text-white transition-colors text-lg leading-none"
+            >✕</button>
+
+            <div className="w-10 h-10 rounded-xl flex items-center justify-center mb-4" style={{ backgroundColor: "#6C63FF20" }}>
+              <span style={{ color: "#6C63FF", fontSize: 18 }}>🔒</span>
+            </div>
+            <h3 className="text-white font-bold text-lg mb-1">You've used your free generation</h3>
+            <p className="text-gray-400 text-sm mb-8">
+              Upgrade to keep generating unlimited prompts for any use case.
+            </p>
+
+            <div className="grid grid-cols-2 gap-4">
+              {/* Monthly */}
+              <div className="p-5 rounded-xl border border-gray-700 bg-gray-950 flex flex-col">
+                <p className="text-xs text-gray-500 uppercase tracking-widest mb-3">Monthly</p>
+                <div className="mb-1">
+                  <span className="text-2xl font-bold text-white">$19.99</span>
+                  <span className="text-gray-500 text-xs"> /mo</span>
+                </div>
+                <p className="text-gray-600 text-xs mb-5">Cancel anytime.</p>
+                <button
+                  onClick={() => { capture("plan_upgraded", { plan: "monthly" }); const link = getStripeLink("monthly", user); if (link) window.location.href = link; }}
+                  className="mt-auto w-full py-2.5 rounded-lg font-bold text-sm transition-all duration-150 active:scale-95 border"
+                  style={{ borderColor: "#6C63FF60", color: "#6C63FF", background: "none" }}
+                >
+                  Upgrade Monthly ↗
+                </button>
+              </div>
+
+              {/* Lifetime */}
+              <div className="p-5 rounded-xl flex flex-col relative overflow-hidden" style={{ border: "2px solid #6C63FF", background: "linear-gradient(135deg, #6C63FF12, #0F0F23)" }}>
+                <div className="absolute top-3 right-3 text-xs font-bold px-2 py-0.5 rounded-full" style={{ backgroundColor: "#6C63FF", color: "white" }}>
+                  Best value
+                </div>
+                <p className="text-xs uppercase tracking-widest mb-3" style={{ color: "#6C63FF" }}>Lifetime</p>
+                <div className="mb-1">
+                  <span className="text-2xl font-bold text-white">$69.99</span>
+                </div>
+                <p className="text-gray-400 text-xs mb-5">One-time. Forever.</p>
+                <button
+                  onClick={() => { capture("plan_upgraded", { plan: "lifetime" }); const link = getStripeLink("lifetime", user); if (link) window.location.href = link; }}
+                  className="mt-auto w-full py-2.5 rounded-lg font-bold text-sm text-white transition-all duration-150 active:scale-95"
+                  style={{ backgroundColor: "#6C63FF" }}
+                >
+                  Get Lifetime ↗
+                </button>
+              </div>
+            </div>
+
+            <p className="text-center text-xs text-gray-700 mt-5">
+              Secure checkout via Stripe. Cancel monthly anytime.
+            </p>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
