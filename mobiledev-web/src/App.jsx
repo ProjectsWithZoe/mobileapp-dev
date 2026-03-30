@@ -2,7 +2,7 @@ import { lazy, Suspense, useState } from 'react'
 import './App.css'
 import { useAuth } from './hooks/useAuth'
 import { getStripeLink } from './lib/stripe'
-import { Analytics } from "@vercel/analytics/next"
+import { Analytics } from "@vercel/analytics/react"
 
 // RunTracker example screenshots — static images, no JS bundle cost
 import example1 from './assets/example1.png'
