@@ -1,6 +1,8 @@
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+
 const ALLOWED_ORIGINS = [
   'http://localhost:5174',
-  'http://localhost:4173',
+  'http://localhost:5173',
   'https://humble-ui.vercel.app',
   'https://humble-ui.co.uk',
 ]
@@ -11,7 +13,7 @@ function corsHeaders(req: Request) {
   return {
     'Access-Control-Allow-Origin': allowed,
     'Access-Control-Allow-Methods': 'POST, OPTIONS',
-    'Access-Control-Allow-Headers': 'Content-Type',
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
   }
 }
 
@@ -39,6 +41,23 @@ Deno.serve(async (req) => {
     })
   }
 
+  // Save to database
+  const supabase = createClient(
+    Deno.env.get('SUPABASE_URL')!,
+    Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!,
+  )
+
+  const { error: dbError } = await supabase.from('contact_submissions').insert({
+    name: name.trim(),
+    email: email.trim(),
+    message: message.trim(),
+  })
+
+  if (dbError) {
+    console.error('Supabase insert error:', dbError)
+  }
+
+  // Send email notification via Resend
   const apiKey = Deno.env.get('RESEND_API_KEY')
   if (!apiKey) {
     console.error('RESEND_API_KEY secret is not set')
