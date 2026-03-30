@@ -2,6 +2,7 @@ import { lazy, Suspense, useState } from 'react'
 import './App.css'
 import { useAuth } from './hooks/useAuth'
 import { getStripeLink } from './lib/stripe'
+import { Analytics } from "@vercel/analytics/next"
 
 // RunTracker example screenshots — static images, no JS bundle cost
 import example1 from './assets/example1.png'
@@ -110,6 +111,7 @@ export default function App() {
   if (!user) {
     return (
       <Suspense fallback={<div className="min-h-screen bg-gray-950" />}>
+        <Analytics/>
         <LandingPage
           onSignIn={() => openAuth('signin')}
           onGetStarted={() => openAuth('signup')}
@@ -135,6 +137,7 @@ export default function App() {
   return (
     <div className="flex flex-col">
       <Suspense fallback={<AppSkeleton />}>
+      <Analytics/>
         <PromptGenerator />
       </Suspense>
       <ExamplesGallery />
