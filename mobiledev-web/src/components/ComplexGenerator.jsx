@@ -1,6 +1,7 @@
 import { useState, useCallback, useRef, useEffect } from "react";
 import { useAuth } from "../hooks/useAuth";
 import { useSavedPrompts } from "../hooks/useSavedPrompts";
+import { useGeneratedPrompts } from "../hooks/useGeneratedPrompts";
 import { useProfile } from "../hooks/useProfile";
 import { isSupabaseConfigured } from "../lib/supabase";
 import { capture } from "../lib/posthog";
@@ -408,7 +409,9 @@ const PalettePreview = ({ colors, name }) => (
 
 // ─── MAIN COMPONENT ──────────────────────────────────────────────────────────
 
-export default function PromptGenerator() {
+const DEMO_STORAGE_KEY = "humble-ui-demo-used";
+
+export default function PromptGenerator({ demoMode = false, onDemoSignUp, onExitDemo }) {
   const [appIdea, setAppIdea] = useState("");
   const [selectedUseCase, setSelectedUseCase] = useState("mobile");
   const [selectedPalette, setSelectedPalette] = useState(0);
@@ -422,6 +425,7 @@ export default function PromptGenerator() {
   // Auth & save state
   const { user, loading: authLoading, signIn, signOut } = useAuth();
   const { prompts, loading: promptsLoading, savePrompt, deletePrompt } = useSavedPrompts(user?.id);
+  const { insertPrompt, logDemoPrompt } = useGeneratedPrompts(user?.id);
   const { isPaid, withinLimit, generationsUsed, incrementGeneration, refresh: refreshProfile } = useProfile(user?.id);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
@@ -448,6 +452,13 @@ export default function PromptGenerator() {
       }
     }, 2000);
     return () => clearInterval(interval);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Demo mode: if they've already used their one free generation, show paywall immediately
+  useEffect(() => {
+    if (demoMode && localStorage.getItem(DEMO_STORAGE_KEY) === "true") {
+      setShowUpgradeModal(true);
+    }
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const [showSaveInput, setShowSaveInput] = useState(false);
@@ -506,7 +517,13 @@ export default function PromptGenerator() {
 
   const generatePrompt = useCallback(async () => {
     if (!canGenerate) return;
-    if (!withinLimit) { setShowUpgradeModal(true); return; }
+
+    if (demoMode) {
+      if (localStorage.getItem(DEMO_STORAGE_KEY) === "true") { setShowUpgradeModal(true); return; }
+    } else if (!withinLimit) {
+      setShowUpgradeModal(true); return;
+    }
+
     const randomStyles = [...styleTokens].sort(() => Math.random() - 0.5).slice(0, 5);
     const builder = PROMPT_BUILDERS[selectedUseCase];
     const prompt = builder({ appIdea, palette, styles: randomStyles, complexity, extraContext });
@@ -516,9 +533,36 @@ export default function PromptGenerator() {
       use_case: selectedUseCase,
       complexity: selectedComplexity,
       palette: palette.name,
+      demo: demoMode,
     });
-    await incrementGeneration();
-  }, [appIdea, selectedUseCase, selectedComplexity, palette, complexity, styleTokens, extraContext, canGenerate, withinLimit, incrementGeneration]);
+
+    if (demoMode) {
+      localStorage.setItem(DEMO_STORAGE_KEY, "true");
+      // Log the demo generation server-side (fire-and-forget — don't await)
+      logDemoPrompt({
+        app_idea: appIdea,
+        use_case: selectedUseCase,
+        palette_name: palette.name,
+        complexity: selectedComplexity,
+        extra_context: extraContext,
+        prompt_text: prompt,
+      });
+      // Show paywall after a beat so the user can see their generated prompt first
+      setTimeout(() => setShowUpgradeModal(true), 900);
+    } else {
+      await Promise.all([
+        incrementGeneration(),
+        insertPrompt({
+          app_idea: appIdea,
+          use_case: selectedUseCase,
+          palette_name: palette.name,
+          complexity: selectedComplexity,
+          extra_context: extraContext,
+          prompt_text: prompt,
+        }),
+      ]);
+    }
+  }, [appIdea, selectedUseCase, selectedComplexity, palette, complexity, styleTokens, extraContext, canGenerate, withinLimit, demoMode, incrementGeneration, insertPrompt, logDemoPrompt]);
 
   const copyToClipboard = useCallback(() => {
     navigator.clipboard.writeText(generatedPrompt);
@@ -539,12 +583,26 @@ export default function PromptGenerator() {
       {/* Top bar */}
       <div className="border-b border-gray-800 px-6 py-3 flex items-center justify-between sticky top-0 bg-gray-950 z-10">
         <div className="flex items-center gap-3">
+          {demoMode && (
+            <button
+              onClick={onExitDemo}
+              className="text-xs text-gray-500 hover:text-gray-300 transition-colors mr-1"
+              style={{ background: "none", border: "none", padding: 0, cursor: "pointer" }}
+            >
+              ← Back
+            </button>
+          )}
           <div className="flex gap-1.5">
             <div className="w-3 h-3 rounded-full bg-red-500 opacity-80" />
             <div className="w-3 h-3 rounded-full bg-yellow-500 opacity-80" />
             <div className="w-3 h-3 rounded-full bg-green-500 opacity-80" />
           </div>
           <span className="text-gray-500 text-xs">prompt-generator.jsx</span>
+          {demoMode && (
+            <span className="text-xs px-2 py-0.5 rounded-full font-bold" style={{ backgroundColor: "#6C63FF20", color: "#6C63FF" }}>
+              Demo · 1 free generation
+            </span>
+          )}
         </div>
         <div className="flex items-center gap-2">
           {isSupabaseConfigured && (
@@ -794,7 +852,7 @@ export default function PromptGenerator() {
               )}
 
               {/* Prompt content */}
-              <pre className="p-5 text-xs text-gray-300 whitespace-pre-wrap leading-relaxed bg-gray-950 overflow-y-auto flex-1 max-h-[calc(100vh-200px)]">
+              <pre className="p-5 text-xs text-gray-300 whitespace-pre-wrap leading-relaxed bg-gray-950 overflow-y-auto flex-1 max-h-[calc(100vh-50px)]">
                 {generatedPrompt}
               </pre>
 
@@ -944,52 +1002,69 @@ export default function PromptGenerator() {
             <div className="w-10 h-10 rounded-xl flex items-center justify-center mb-4" style={{ backgroundColor: "#6C63FF20" }}>
               <span style={{ color: "#6C63FF", fontSize: 18 }}>🔒</span>
             </div>
-            <h3 className="text-white font-bold text-lg mb-1">You've used your free generation</h3>
-            <p className="text-gray-400 text-sm mb-8">
-              Upgrade to keep generating unlimited prompts for any use case.
+            <h3 className="text-white font-bold text-lg mb-1">
+              {demoMode ? "Enjoyed the demo?" : "You've used your free generation"}
+            </h3>
+            <p className="text-gray-400 text-sm mb-6">
+              {demoMode
+                ? "Create a free account to get 1 more generation — then onto a paid plan for unlimited."
+                : "Upgrade to keep generating unlimited prompts for any use case."}
             </p>
+            {demoMode && (
+              <button
+                onClick={() => { setShowUpgradeModal(false); onDemoSignUp?.(); }}
+                className="w-full py-2.5 rounded-xl font-bold text-sm text-white mb-4 transition-all duration-150 active:scale-95"
+                style={{ backgroundColor: "#3FB950" }}
+              >
+                Create free account →
+              </button>
+            )}
 
-            <div className="grid grid-cols-2 gap-4">
-              {/* Monthly */}
-              <div className="p-5 rounded-xl border border-gray-700 bg-gray-950 flex flex-col">
-                <p className="text-xs text-gray-500 uppercase tracking-widest mb-3">Monthly</p>
-                <div className="mb-1">
-                  <span className="text-2xl font-bold text-white">$19.99</span>
-                  <span className="text-gray-500 text-xs"> /mo</span>
-                </div>
-                <p className="text-gray-600 text-xs mb-5">Cancel anytime.</p>
-                <button
-                  onClick={() => { capture("plan_upgraded", { plan: "monthly" }); const link = getStripeLink("monthly", user); if (link) window.location.href = link; }}
-                  className="mt-auto w-full py-2.5 rounded-lg font-bold text-sm transition-all duration-150 active:scale-95 border"
-                  style={{ borderColor: "#6C63FF60", color: "#6C63FF", background: "none" }}
-                >
-                  Upgrade Monthly ↗
-                </button>
-              </div>
+            {!demoMode && (
+              <>
+                <div className="grid grid-cols-2 gap-4">
+                  {/* Monthly */}
+                  <div className="p-5 rounded-xl border border-gray-700 bg-gray-950 flex flex-col">
+                    <p className="text-xs text-gray-500 uppercase tracking-widest mb-3">Monthly</p>
+                    <div className="mb-1">
+                      <span className="text-2xl font-bold text-white">$19.99</span>
+                      <span className="text-gray-500 text-xs"> /mo</span>
+                    </div>
+                    <p className="text-gray-600 text-xs mb-5">Cancel anytime.</p>
+                    <button
+                      onClick={() => { capture("plan_upgraded", { plan: "monthly" }); const link = getStripeLink("monthly", user); if (link) window.location.href = link; }}
+                      className="mt-auto w-full py-2.5 rounded-lg font-bold text-sm transition-all duration-150 active:scale-95 border"
+                      style={{ borderColor: "#6C63FF60", color: "#6C63FF", background: "none" }}
+                    >
+                      Upgrade Monthly ↗
+                    </button>
+                  </div>
 
-              {/* Lifetime */}
-              <div className="p-5 rounded-xl flex flex-col relative overflow-hidden" style={{ border: "2px solid #6C63FF", background: "linear-gradient(135deg, #6C63FF12, #0F0F23)" }}>
-                <div className="absolute top-3 right-3 text-xs font-bold px-2 py-0.5 rounded-full" style={{ backgroundColor: "#6C63FF", color: "white" }}>
-                  Best value
+                  {/* Lifetime */}
+                  <div className="p-5 rounded-xl flex flex-col relative overflow-hidden" style={{ border: "2px solid #6C63FF", background: "linear-gradient(135deg, #6C63FF12, #0F0F23)" }}>
+                    <div className="absolute top-3 right-3 text-xs font-bold px-2 py-0.5 rounded-full" style={{ backgroundColor: "#6C63FF", color: "white" }}>
+                      Best value
+                    </div>
+                    <p className="text-xs uppercase tracking-widest mb-3" style={{ color: "#6C63FF" }}>Lifetime</p>
+                    <div className="mb-1">
+                      <span className="text-2xl font-bold text-white">$69.99</span>
+                    </div>
+                    <p className="text-gray-400 text-xs mb-5">One-time. Forever.</p>
+                    <button
+                      onClick={() => { capture("plan_upgraded", { plan: "lifetime" }); const link = getStripeLink("lifetime", user); if (link) window.location.href = link; }}
+                      className="mt-auto w-full py-2.5 rounded-lg font-bold text-sm text-white transition-all duration-150 active:scale-95"
+                      style={{ backgroundColor: "#6C63FF" }}
+                    >
+                      Get Lifetime ↗
+                    </button>
+                  </div>
                 </div>
-                <p className="text-xs uppercase tracking-widest mb-3" style={{ color: "#6C63FF" }}>Lifetime</p>
-                <div className="mb-1">
-                  <span className="text-2xl font-bold text-white">$69.99</span>
-                </div>
-                <p className="text-gray-400 text-xs mb-5">One-time. Forever.</p>
-                <button
-                  onClick={() => { capture("plan_upgraded", { plan: "lifetime" }); const link = getStripeLink("lifetime", user); if (link) window.location.href = link; }}
-                  className="mt-auto w-full py-2.5 rounded-lg font-bold text-sm text-white transition-all duration-150 active:scale-95"
-                  style={{ backgroundColor: "#6C63FF" }}
-                >
-                  Get Lifetime ↗
-                </button>
-              </div>
-            </div>
 
-            <p className="text-center text-xs text-gray-700 mt-5">
-              Secure checkout via Stripe. Cancel monthly anytime.
-            </p>
+                <p className="text-center text-xs text-gray-700 mt-5">
+                  Secure checkout via Stripe. Cancel monthly anytime.
+                </p>
+              </>
+            )}
           </div>
         </div>
       )}

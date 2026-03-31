@@ -96,6 +96,7 @@ const APP_GALLERY = [
 function PricingModal({ plan, onClose, onConfirm }) {
   const isLifetime = plan === "lifetime";
   return (
+    
     <div
       className="fixed inset-0 z-50 flex items-center justify-center px-4"
       style={{ backgroundColor: "rgba(0,0,0,0.7)", backdropFilter: "blur(4px)" }}
@@ -146,7 +147,7 @@ function PricingModal({ plan, onClose, onConfirm }) {
 }
 
 // ─── MAIN LANDING PAGE ────────────────────────────────────────────────────────
-export default function LandingPage({ onSignIn, onGetStarted, onSubscribe }) {
+export default function LandingPage({ onSignIn, onGetStarted, onSubscribe, onDemo }) {
   const [modalPlan, setModalPlan] = useState(null);
   const [showContact, setShowContact] = useState(false);
   const [contactForm, setContactForm] = useState({ name: "", email: "", message: "" });
@@ -216,9 +217,9 @@ export default function LandingPage({ onSignIn, onGetStarted, onSubscribe }) {
             Register
           </button>
           <button
+            onClick={onDemo}
             className="text-xs font-bold px-4 py-2 rounded-lg text-white transition-all duration-150 active:scale-95"
             style={{ backgroundColor: PURPLE }}
-
           >
             Free Demo
           </button>

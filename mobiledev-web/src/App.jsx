@@ -2,7 +2,6 @@ import { lazy, Suspense, useState } from 'react'
 import './App.css'
 import { useAuth } from './hooks/useAuth'
 import { getStripeLink } from './lib/stripe'
-import { Analytics } from "@vercel/analytics/react"
 
 // RunTracker example screenshots — static images, no JS bundle cost
 import example1 from './assets/example1.png'
@@ -100,6 +99,7 @@ export default function App() {
   const { user, loading, signIn, signUp } = useAuth()
   const [showAuthModal, setShowAuthModal] = useState(false)
   const [authMode, setAuthMode] = useState('signin')
+  const [isDemoMode, setIsDemoMode] = useState(false)
 
   const openAuth = (mode) => { setAuthMode(mode); setShowAuthModal(true) }
 
@@ -107,14 +107,35 @@ export default function App() {
   // a flash of the landing page for already-signed-in users.
   if (loading) return <AppSkeleton />
 
-  // ── Not signed in → landing page ──
+  // ── Not signed in → landing page (or demo) ──
   if (!user) {
+    if (isDemoMode) {
+      return (
+        <Suspense fallback={<AppSkeleton />}>
+          <PromptGenerator
+            demoMode
+            onDemoSignUp={() => openAuth('signup')}
+            onExitDemo={() => setIsDemoMode(false)}
+          />
+          {showAuthModal && (
+            <Suspense fallback={null}>
+              <AuthModal
+                onClose={() => setShowAuthModal(false)}
+                onSignIn={authMode === 'signup' ? signUp : signIn}
+                mode={authMode}
+              />
+            </Suspense>
+          )}
+        </Suspense>
+      )
+    }
+
     return (
       <Suspense fallback={<div className="min-h-screen bg-gray-950" />}>
-        <Analytics/>
         <LandingPage
           onSignIn={() => openAuth('signin')}
           onGetStarted={() => openAuth('signup')}
+          onDemo={() => setIsDemoMode(true)}
           onSubscribe={(plan) => {
             const link = getStripeLink(plan, user)
             if (link) { window.location.href = link } else { openAuth('signup') }
@@ -137,7 +158,6 @@ export default function App() {
   return (
     <div className="flex flex-col">
       <Suspense fallback={<AppSkeleton />}>
-      <Analytics/>
         <PromptGenerator />
       </Suspense>
       <ExamplesGallery />
