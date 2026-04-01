@@ -656,7 +656,7 @@ export default function PromptGenerator({ demoMode = false, onDemoSignUp, onExit
         {/* LEFT COLUMN — CONFIG */}
         <div className="space-y-7">
           <div>
-            <h1 className="text-2xl font-bold text-white leading-tight">HUmbleUI Prompt Generator</h1>
+            <h1 className="text-2xl font-bold text-white leading-tight">HumbleUI Prompt Generator</h1>
             <p className="text-gray-500 text-sm mt-1">Generate senior-level dev prompts for any use case</p>
           </div>
 

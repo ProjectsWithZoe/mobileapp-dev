@@ -27,6 +27,7 @@ export function useAuth() {
   // signIn: shouldCreateUser:false means Supabase errors if the email has no account,
   // preventing accidental account creation via the sign-in form.
   const signIn = useCallback(async (email) => {
+    if (!supabase) throw new Error('Auth is not configured.')
     const { error } = await supabase.auth.signInWithOtp({
       email,
       options: { emailRedirectTo: window.location.origin, shouldCreateUser: false },
@@ -36,6 +37,7 @@ export function useAuth() {
 
   // signUp: checks for existing account via RPC first, errors if found, otherwise creates.
   const signUp = useCallback(async (email) => {
+    if (!supabase) throw new Error('Auth is not configured.')
     const { data: exists, error: checkError } = await supabase.rpc('email_exists', { check_email: email })
     if (checkError) throw checkError
     if (exists) throw new Error('An account with this email already exists. Please sign in instead.')
@@ -48,6 +50,7 @@ export function useAuth() {
   }, [])
 
   const signOut = useCallback(async () => {
+    if (!supabase) return
     await supabase.auth.signOut()
   }, [])
 
