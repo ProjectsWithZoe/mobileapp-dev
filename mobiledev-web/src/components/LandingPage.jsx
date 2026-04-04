@@ -213,14 +213,7 @@ export default function LandingPage({ onSignIn, onGetStarted, onSubscribe, onDem
           >
             Sign in
           </button>
-          <button
-            onClick={onGetStarted}
-            className="text-gray-400 hover:text-white text-xs transition-colors"
-            style={{ background: "none", border: "2px solid gray", padding: "10 px", cursor: "pointer" }}
-
-          >
-            Register
-          </button>
+          
           <button
             onClick={onDemo}
             className="text-xs font-bold px-4 py-2 rounded-lg text-white transition-all duration-150 active:scale-95"
