@@ -762,7 +762,7 @@ export default function PromptGenerator({ demoMode = false, onDemoSignUp, onExit
           >
             {!withinLimit
               ? "🔒 Upgrade to Generate More"
-              : promptGenerated ? "↻ Regenerate Prompt" : "→ Generate Prompt"}
+              : promptGenerated ? "→ Generate New Prompt" : "→ Generate Prompt"}
           </button>
         </div>
 
