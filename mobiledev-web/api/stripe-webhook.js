@@ -3,6 +3,7 @@
 //   STRIPE_WEBHOOK_SECRET     — Stripe Dashboard → Webhooks → signing secret
 //   SUPABASE_SERVICE_ROLE_KEY — Supabase project settings → API → service_role key
 //   VITE_SUPABASE_URL         — Supabase project URL (reuse existing env var)
+//   APP_URL                   — Public app URL for magic-link redirectTo (e.g. https://humble-ui.com)
 
 import Stripe from 'stripe'
 import { createClient } from '@supabase/supabase-js'
@@ -91,6 +92,21 @@ export default async function handler(req, res) {
       return res.status(500).send()
     }
     console.log(`[stripe-webhook] Stored pending activation for ${email} (${plan})`)
+
+    // Send activation magic link to the payer's email so they can create their account
+    const appUrl = process.env.APP_URL ?? 'https://humble-ui.com'
+    try {
+      await supabase.auth.admin.generateLink({
+        type: 'magiclink',
+        email,
+        options: { redirectTo: appUrl },
+      })
+      console.log(`[stripe-webhook] Activation email sent to ${email}`)
+    } catch (emailErr) {
+      // Non-fatal — log and continue; the pending activation record is already saved
+      console.error(`[stripe-webhook] Failed to send activation email to ${email}:`, emailErr.message)
+    }
+
     return res.status(200).json({ received: true })
   }
 

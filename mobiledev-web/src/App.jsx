@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect, useState } from 'react'
+import { lazy, Suspense, useState } from 'react'
 import './App.css'
 import { useAuth } from './hooks/useAuth'
 import { getStripeLink } from './lib/stripe'
@@ -101,32 +101,8 @@ export default function App() {
   const [showAuthModal, setShowAuthModal] = useState(false)
   const [authMode, setAuthMode] = useState('signin')
   const [isDemoMode, setIsDemoMode] = useState(false)
-  const [pendingPlan, setPendingPlan] = useState(null)
 
   const openAuth = (mode) => { setAuthMode(mode); setShowAuthModal(true) }
-
-  // Called by AuthModal as soon as the OTP email is dispatched (before the user
-  // clicks the magic link). If a plan is pending, redirect to Stripe immediately
-  // using just the email — no client_reference_id yet (webhook stores the
-  // pending activation and claim_pending_activation applies it on sign-in).
-  const handleOtpSent = (email) => {
-    if (!pendingPlan) return
-    const link = getStripeLink(pendingPlan, { email })
-    if (link) {
-      setPendingPlan(null) // clear so the useEffect below doesn't double-redirect
-      window.location.href = link
-    }
-  }
-
-  // After auth completes, fulfil any pending Stripe plan the user selected
-  // before signing in/up (covers the case where pendingPlan wasn't consumed
-  // by handleOtpSent, e.g. already-signed-in user).
-  useEffect(() => {
-    if (!user || !pendingPlan) return
-    const link = getStripeLink(pendingPlan, user)
-    setPendingPlan(null)
-    if (link) window.location.href = link
-  }, [user, pendingPlan])
 
   // Post-payment confirmation page — render before session check so unauthenticated
   // users also land here correctly (the component handles the no-session case).
@@ -158,8 +134,6 @@ export default function App() {
                 onClose={() => setShowAuthModal(false)}
                 onSignIn={authMode === 'signup' ? signUp : signIn}
                 mode={authMode}
-                onOtpSent={handleOtpSent}
-                hasPendingPlan={!!pendingPlan}
               />
             </Suspense>
           )}
@@ -174,7 +148,6 @@ export default function App() {
           onGetStarted={() => openAuth('signup')}
           onDemo={() => openAuth('signup')}
           onSubscribe={(plan) => {
-            if (!user) { setPendingPlan(plan); openAuth('signup'); return }
             const link = getStripeLink(plan, user)
             if (link) window.location.href = link
           }}
@@ -185,8 +158,6 @@ export default function App() {
               onClose={() => setShowAuthModal(false)}
               onSignIn={authMode === 'signup' ? signUp : signIn}
               mode={authMode}
-              onOtpSent={handleOtpSent}
-              hasPendingPlan={!!pendingPlan}
             />
           </Suspense>
         )}

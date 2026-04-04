@@ -67,11 +67,10 @@ export default function PaymentSuccess() {
   if (noSession) {
     return (
       <Screen>
-        <Icon>✅</Icon>
+        <Icon>✉️</Icon>
         <Kicker>Payment received</Kicker>
-        <h1 className="text-xl font-semibold text-white mb-2">Your plan is ready to activate</h1>
-        <p className="text-gray-400 text-sm mb-6">Sign up or log in with the email you used at checkout — your plan will be applied automatically.</p>
-        <a href="/" className="inline-block px-6 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-semibold rounded-lg transition-colors">Sign up / Log in</a>
+        <h1 className="text-xl font-semibold text-white mb-2">Check your email</h1>
+        <p className="text-gray-400 text-sm mb-6">We sent an activation link to the email you used at checkout. Click it to create your account and start building.</p>
       </Screen>
     )
   }

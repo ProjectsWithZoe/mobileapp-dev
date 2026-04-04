@@ -92,71 +92,11 @@ const APP_GALLERY = [
   },
 ];
 
-// ─── PRICING MODAL ────────────────────────────────────────────────────────────
-function PricingModal({ plan, onClose, onConfirm }) {
-  const isLifetime = plan === "lifetime";
-  return (
-    
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center px-4"
-      style={{ backgroundColor: "rgba(0,0,0,0.7)", backdropFilter: "blur(4px)" }}
-    >
-      <div className="bg-gray-900 border border-gray-700 rounded-2xl p-8 max-w-sm w-full relative">
-        <button
-          onClick={onClose}
-          className="absolute top-4 right-4 text-gray-500 hover:text-white transition-colors"
-          style={{ background: "none", border: "none", padding: 0 }}
-        >
-          <X size={18} />
-        </button>
-        <div
-          className="w-10 h-10 rounded-xl flex items-center justify-center mb-4"
-          style={{ backgroundColor: `${PURPLE}20` }}
-        >
-          {isLifetime ? (
-            <Zap size={20} style={{ color: PURPLE }} />
-          ) : (
-            <Sparkles size={20} style={{ color: PURPLE }} />
-          )}
-        </div>
-        <h3 className="text-white font-bold text-lg mb-1">
-          {isLifetime ? "Lifetime Access" : "Monthly Plan"}
-        </h3>
-        <p className="text-gray-400 text-sm mb-6">
-          {isLifetime
-            ? "One payment. All future updates included. No subscriptions."
-            : "Full access for $9.99/month. Cancel whenever you want."}
-        </p>
-        <div className="text-3xl font-bold text-white mb-6">
-          {isLifetime ? "$49.99" : "$9.99"}
-          {!isLifetime && <span className="text-gray-500 text-base font-normal"> /mo</span>}
-        </div>
-        <p className="text-xs text-gray-600 mb-4">
-          This is a demo — clicking below simulates a completed purchase.
-        </p>
-        <button
-          onClick={onConfirm}
-          className="w-full py-3 rounded-xl font-bold text-sm text-white transition-all duration-150 active:scale-95"
-          style={{ backgroundColor: PURPLE }}
-        >
-          {isLifetime ? "Get Lifetime Access →" : "Start Monthly Plan →"}
-        </button>
-      </div>
-    </div>
-  );
-}
-
 // ─── MAIN LANDING PAGE ────────────────────────────────────────────────────────
 export default function LandingPage({ onSignIn, onGetStarted, onSubscribe, onDemo }) {
-  const [modalPlan, setModalPlan] = useState(null);
   const [showContact, setShowContact] = useState(false);
   const [contactForm, setContactForm] = useState({ name: "", email: "", message: "" });
   const [contactStatus, setContactStatus] = useState("idle"); // idle | sending | sent | error
-
-  const handleConfirm = () => {
-    setModalPlan(null);
-    onSubscribe?.(modalPlan);
-  };
 
   const handleContactSend = async () => {
     if (!contactForm.name.trim() || !contactForm.email.trim() || !contactForm.message.trim()) return;
@@ -298,7 +238,7 @@ export default function LandingPage({ onSignIn, onGetStarted, onSubscribe, onDem
         {/* CTAs */}
         <div className="flex flex-col sm:flex-row gap-3 items-center justify-center">
           <button
-            onClick={() => setModalPlan("lifetime")}
+            onClick={() => onSubscribe?.("lifetime")}
             className="w-full sm:w-auto flex items-center justify-center gap-2 px-7 py-3.5 rounded-xl font-bold text-sm text-white transition-all duration-150 active:scale-95"
             style={{ backgroundColor: PURPLE }}
           >
@@ -306,7 +246,7 @@ export default function LandingPage({ onSignIn, onGetStarted, onSubscribe, onDem
             <ArrowRight size={15} />
           </button>
           <button
-            onClick={() => setModalPlan("monthly")}
+            onClick={() => onSubscribe?.("monthly")}
             className="w-full sm:w-auto flex items-center justify-center gap-2 px-7 py-3.5 rounded-xl font-bold text-sm transition-all duration-150 active:scale-95 border"
             style={{ borderColor: `${PURPLE}60`, color: PURPLE, background: "none" }}
           >
@@ -600,7 +540,7 @@ export default function LandingPage({ onSignIn, onGetStarted, onSubscribe, onDem
               ))}
             </ul>
             <button
-              onClick={() => setModalPlan("monthly")}
+              onClick={() => onSubscribe?.("monthly")}
               className="w-full py-3 rounded-xl font-bold text-sm transition-all duration-150 active:scale-95 border"
               style={{ borderColor: `${PURPLE}60`, color: PURPLE, background: "none" }}
             >
@@ -641,7 +581,7 @@ export default function LandingPage({ onSignIn, onGetStarted, onSubscribe, onDem
               ))}
             </ul>
             <button
-              onClick={() => setModalPlan("lifetime")}
+              onClick={() => onSubscribe?.("lifetime")}
               className="w-full py-3 rounded-xl font-bold text-sm text-white transition-all duration-150 active:scale-95"
               style={{ backgroundColor: PURPLE }}
             >
@@ -668,7 +608,7 @@ export default function LandingPage({ onSignIn, onGetStarted, onSubscribe, onDem
             that makes your AI actually produce something worth shipping.
           </p>
           <button
-            onClick={() => setModalPlan("lifetime")}
+            onClick={() => onSubscribe?.("lifetime")}
             className="inline-flex items-center gap-2 px-8 py-3.5 rounded-xl font-bold text-sm text-white transition-all duration-150 active:scale-95"
             style={{ backgroundColor: PURPLE }}
           >
@@ -692,15 +632,6 @@ export default function LandingPage({ onSignIn, onGetStarted, onSubscribe, onDem
           © {new Date().getFullYear()} Humble-UI. All rights reserved.
         </p>
       </footer>
-
-      {/* ── PRICING MODAL ── */}
-      {modalPlan && (
-        <PricingModal
-          plan={modalPlan}
-          onClose={() => setModalPlan(null)}
-          onConfirm={handleConfirm}
-        />
-      )}
 
       {/* Contact modal */}
       {showContact && (
