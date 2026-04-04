@@ -93,18 +93,25 @@ export default async function handler(req, res) {
     }
     console.log(`[stripe-webhook] Stored pending activation for ${email} (${plan})`)
 
-    // Send activation magic link to the payer's email so they can create their account
+    // Send activation email. generateLink works for existing users; invite works for new ones.
     const appUrl = process.env.APP_URL ?? 'https://humble-ui.com'
-    const { data: linkData, error: emailError } = await supabase.auth.admin.generateLink({
+    const { data: linkData, error: linkError } = await supabase.auth.admin.generateLink({
       type: 'magiclink',
       email,
       options: { redirectTo: appUrl },
     })
-    if (emailError) {
-      // Non-fatal — log and continue; the pending activation record is already saved
-      console.error(`[stripe-webhook] Failed to send activation email to ${email}:`, emailError.message)
+    if (linkError) {
+      console.warn(`[stripe-webhook] generateLink failed for ${email} (${linkError.message}) — trying invite`)
+      const { error: inviteError } = await supabase.auth.admin.inviteUserByEmail(email, {
+        redirectTo: appUrl,
+      })
+      if (inviteError) {
+        console.error(`[stripe-webhook] Failed to send invite to ${email}:`, inviteError.message)
+      } else {
+        console.log(`[stripe-webhook] Invite email sent to ${email}`)
+      }
     } else {
-      console.log(`[stripe-webhook] Activation email sent to ${email} (user id: ${linkData?.user?.id ?? 'unknown'})`)
+      console.log(`[stripe-webhook] Magic link sent to ${email} (user id: ${linkData?.user?.id ?? 'unknown'})`)
     }
 
     return res.status(200).json({ received: true })
