@@ -26,11 +26,13 @@ export function useAuth() {
 
   // signIn: shouldCreateUser:false means Supabase errors if the email has no account,
   // preventing accidental account creation via the sign-in form.
+  const appUrl = import.meta.env.VITE_APP_URL || window.location.origin
+
   const signIn = useCallback(async (email) => {
     if (!supabase) throw new Error('Auth is not configured.')
     const { error } = await supabase.auth.signInWithOtp({
       email,
-      options: { emailRedirectTo: window.location.origin, shouldCreateUser: false },
+      options: { emailRedirectTo: appUrl, shouldCreateUser: false },
     })
     if (error) throw new Error('No account found for this email. Please sign up first.')
   }, [])
@@ -44,7 +46,7 @@ export function useAuth() {
 
     const { error } = await supabase.auth.signInWithOtp({
       email,
-      options: { emailRedirectTo: window.location.origin, shouldCreateUser: true },
+      options: { emailRedirectTo: appUrl, shouldCreateUser: true },
     })
     if (error) throw error
   }, [])

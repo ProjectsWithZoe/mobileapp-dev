@@ -426,34 +426,12 @@ export default function PromptGenerator({ demoMode = false, onDemoSignUp, onExit
   const { user, loading: authLoading, signIn, signOut } = useAuth();
   const { prompts, loading: promptsLoading, savePrompt, deletePrompt } = useSavedPrompts(user?.id);
   const { insertPrompt, logDemoPrompt } = useGeneratedPrompts(user?.id);
-  const { isPaid, withinLimit, generationsUsed, incrementGeneration, refresh: refreshProfile } = useProfile(user?.id);
+  const { isPaid, withinLimit, generationsUsed, incrementGeneration, loading: profileLoading, profile } = useProfile(user?.id);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const [showContactModal, setShowContactModal] = useState(false);
   const [contactForm, setContactForm] = useState({ name: "", email: "", message: "" });
   const [contactStatus, setContactStatus] = useState("idle");
-  const [paymentBanner, setPaymentBanner] = useState(null);
-
-  // Handle ?payment=success redirect from Stripe
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    if (params.get("payment") !== "success") return;
-    setPaymentBanner("pending");
-    history.replaceState(null, "", window.location.pathname);
-    let attempts = 0;
-    const interval = setInterval(async () => {
-      attempts++;
-      const latest = await refreshProfile();
-      const paid = latest?.plan === "monthly" || latest?.plan === "lifetime";
-      if (paid || attempts >= 10) {
-        clearInterval(interval);
-        setPaymentBanner(paid ? "done" : null);
-        if (paid) setTimeout(() => setPaymentBanner(null), 4000);
-      }
-    }, 2000);
-    return () => clearInterval(interval);
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
-
   // Demo mode: if they've already used their one free generation, show paywall immediately
   useEffect(() => {
     if (demoMode && localStorage.getItem(DEMO_STORAGE_KEY) === "true") {
@@ -520,6 +498,8 @@ export default function PromptGenerator({ demoMode = false, onDemoSignUp, onExit
 
     if (demoMode) {
       if (localStorage.getItem(DEMO_STORAGE_KEY) === "true") { setShowUpgradeModal(true); return; }
+    } else if (user && !profile) {
+      return; // profile not yet loaded — button should already be disabled, belt-and-suspenders
     } else if (!withinLimit) {
       setShowUpgradeModal(true); return;
     }
@@ -573,13 +553,6 @@ export default function PromptGenerator({ demoMode = false, onDemoSignUp, onExit
 
   return (
     <div className="min-h-screen bg-gray-950 text-white" style={{ fontFamily: "'IBM Plex Mono', monospace" }}>
-      {/* Payment success banner */}
-      {paymentBanner && (
-        <div className="w-full px-4 py-3 text-sm font-semibold text-center" style={{ backgroundColor: paymentBanner === "done" ? "#166534" : "#14532d", color: "#86efac" }}>
-          {paymentBanner === "done" ? "✓ Plan activated! Enjoy unlimited generations." : "Payment successful! Activating your plan…"}
-        </div>
-      )}
-
       {/* Top bar */}
       <div className="border-b border-gray-800 px-6 py-3 flex items-center justify-between sticky top-0 bg-gray-950 z-10">
         <div className="flex items-center gap-3">
@@ -775,7 +748,7 @@ export default function PromptGenerator({ demoMode = false, onDemoSignUp, onExit
           {/* Generate Button */}
           <button
             onClick={generatePrompt}
-            disabled={withinLimit && !canGenerate}
+            disabled={!canGenerate || (!!user && profileLoading)}
             className="w-full py-4 rounded-xl font-bold text-sm transition-all duration-200 active:scale-95 disabled:opacity-30 disabled:cursor-not-allowed"
             style={{ backgroundColor: (!withinLimit || canGenerate) ? "#6C63FF" : "#374151", color: "white" }}
           >
