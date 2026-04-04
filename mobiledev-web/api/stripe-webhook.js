@@ -1,9 +1,11 @@
 // Required env vars:
-//   STRIPE_SECRET_KEY         — Stripe Dashboard → Developers → API keys → Secret key
-//   STRIPE_WEBHOOK_SECRET     — Stripe Dashboard → Webhooks → signing secret
-//   SUPABASE_SERVICE_ROLE_KEY — Supabase project settings → API → service_role key
-//   VITE_SUPABASE_URL         — Supabase project URL (reuse existing env var)
-//   APP_URL                   — Public app URL for magic-link redirectTo (e.g. https://humble-ui.com)
+//   STRIPE_SECRET_KEY                      — Stripe Dashboard → Developers → API keys → Secret key
+//   STRIPE_WEBHOOK_SECRET                  — Stripe Dashboard → Webhooks → signing secret
+//   SUPABASE_SERVICE_ROLE_KEY              — Supabase project settings → API → service_role key
+//   VITE_SUPABASE_URL                      — Supabase project URL (reuse existing env var)
+//   VITE_SUPABASE_ANON_KEY                 — Supabase project anon/public key (used to send OTP emails)
+//     (also checked as VITE_SUPABASE_PUBLISHABLE_DEFAULT_KEY)
+//   APP_URL                                — Public app URL for magic-link redirectTo (e.g. https://humble-ui.com)
 
 import Stripe from 'stripe'
 import { createClient } from '@supabase/supabase-js'
@@ -93,25 +95,29 @@ export default async function handler(req, res) {
     }
     console.log(`[stripe-webhook] Stored pending activation for ${email} (${plan})`)
 
-    // Send activation email. generateLink works for existing users; invite works for new ones.
+    // signInWithOtp via the anon key is the correct way to trigger Supabase to actually
+    // send an email. admin.generateLink returns a link but sends no email by design.
     const appUrl = process.env.APP_URL ?? 'https://humble-ui.com'
-    const { data: linkData, error: linkError } = await supabase.auth.admin.generateLink({
-      type: 'magiclink',
-      email,
-      options: { redirectTo: appUrl },
-    })
-    if (linkError) {
-      console.warn(`[stripe-webhook] generateLink failed for ${email} (${linkError.message}) — trying invite`)
-      const { error: inviteError } = await supabase.auth.admin.inviteUserByEmail(email, {
-        redirectTo: appUrl,
-      })
-      if (inviteError) {
-        console.error(`[stripe-webhook] Failed to send invite to ${email}:`, inviteError.message)
-      } else {
-        console.log(`[stripe-webhook] Invite email sent to ${email}`)
-      }
+    const anonKey =
+      process.env.SUPABASE_ANON_KEY ??
+      process.env.VITE_SUPABASE_PUBLISHABLE_DEFAULT_KEY ??
+      process.env.VITE_SUPABASE_ANON_KEY
+
+    if (!anonKey) {
+      console.error('[stripe-webhook] Missing Supabase anon key — cannot send activation email')
     } else {
-      console.log(`[stripe-webhook] Magic link sent to ${email} (user id: ${linkData?.user?.id ?? 'unknown'})`)
+      const supabasePublic = createClient(supabaseUrl, anonKey, {
+        auth: { persistSession: false },
+      })
+      const { error: otpError } = await supabasePublic.auth.signInWithOtp({
+        email,
+        options: { shouldCreateUser: true, emailRedirectTo: appUrl },
+      })
+      if (otpError) {
+        console.error(`[stripe-webhook] Failed to send OTP to ${email}:`, otpError.message)
+      } else {
+        console.log(`[stripe-webhook] Activation OTP sent to ${email}`)
+      }
     }
 
     return res.status(200).json({ received: true })
