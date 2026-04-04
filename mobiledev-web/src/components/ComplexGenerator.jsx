@@ -439,6 +439,14 @@ export default function PromptGenerator({ demoMode = false, onDemoSignUp, onExit
     }
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // After demo sign-up: auto-open pricing modal once profile loads
+  useEffect(() => {
+    if (!profile) return;
+    if (localStorage.getItem('humble-ui-show-pricing') !== 'true') return;
+    localStorage.removeItem('humble-ui-show-pricing');
+    if (!isPaid) setShowUpgradeModal(true);
+  }, [profile, isPaid]);
+
   const [showSaveInput, setShowSaveInput] = useState(false);
   const [saveName, setSaveName] = useState("");
   const [saving, setSaving] = useState(false);
@@ -985,7 +993,7 @@ export default function PromptGenerator({ demoMode = false, onDemoSignUp, onExit
             </p>
             {demoMode && (
               <button
-                onClick={() => { setShowUpgradeModal(false); onDemoSignUp?.(); }}
+                onClick={() => { localStorage.setItem('humble-ui-show-pricing', 'true'); setShowUpgradeModal(false); onDemoSignUp?.(); }}
                 className="w-full py-2.5 rounded-xl font-bold text-sm text-white mb-4 transition-all duration-150 active:scale-95"
                 style={{ backgroundColor: "#3FB950" }}
               >

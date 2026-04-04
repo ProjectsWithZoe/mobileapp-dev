@@ -1,9 +1,11 @@
 // Required env vars:
-//   STRIPE_SECRET_KEY     — from Stripe Dashboard → Developers → API keys → Secret key
-//   STRIPE_WEBHOOK_SECRET — from Stripe Dashboard → Webhooks → signing secret
-//                           If testing with the CLI, find it by running 'stripe listen'
+//   STRIPE_SECRET_KEY         — Stripe Dashboard → Developers → API keys → Secret key
+//   STRIPE_WEBHOOK_SECRET     — Stripe Dashboard → Webhooks → signing secret
+//   SUPABASE_SERVICE_ROLE_KEY — Supabase project settings → API → service_role key
+//   VITE_SUPABASE_URL         — Supabase project URL (reuse existing env var)
 
 import Stripe from 'stripe'
+import { createClient } from '@supabase/supabase-js'
 
 export const config = { api: { bodyParser: false } }
 
@@ -23,6 +25,8 @@ export default async function handler(req, res) {
 
   const stripe = new Stripe(process.env.STRIPE_SECRET_KEY)
   const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET
+  const supabaseUrl = process.env.SUPABASE_URL ?? process.env.VITE_SUPABASE_URL
+  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY
 
   let event = req.body
 
@@ -37,21 +41,85 @@ export default async function handler(req, res) {
     }
   }
 
-  switch (event.type) {
-    case 'payment_intent.succeeded': {
-      const paymentIntent = event.data.object
-      console.log(`PaymentIntent for ${paymentIntent.amount} was successful!`)
-      // handlePaymentIntentSucceeded(paymentIntent)
-      break
+  // ── checkout.session.completed ─────────────────────────────────────────────
+  if (event.type === 'checkout.session.completed') {
+    const session = event.data.object
+    const userId = session.client_reference_id
+    const customerId = session.customer
+    const plan = session.mode === 'subscription' ? 'monthly' : 'lifetime'
+
+    if (!supabaseUrl || !serviceRoleKey) {
+      console.error('[stripe-webhook] Missing Supabase env vars')
+      return res.status(500).send()
     }
-    case 'payment_method.attached': {
-      const paymentMethod = event.data.object
-      // handlePaymentMethodAttached(paymentMethod)
-      break
+
+    const supabase = createClient(supabaseUrl, serviceRoleKey, {
+      auth: { persistSession: false },
+    })
+
+    // Path A: signed-in checkout — update user_profiles directly
+    if (userId) {
+      const { error } = await supabase
+        .from('user_profiles')
+        .update({
+          plan,
+          ...(customerId ? { stripe_customer_id: customerId } : {}),
+        })
+        .eq('id', userId)
+
+      if (error) {
+        console.error(`[stripe-webhook] Failed to upgrade user ${userId}:`, error.message)
+        return res.status(500).send()
+      }
+      console.log(`[stripe-webhook] Upgraded user ${userId} to ${plan}`)
+      return res.status(200).json({ received: true })
     }
-    default:
-      console.log(`Unhandled event type ${event.type}.`)
+
+    // Path B: guest checkout — store pending activation keyed by email
+    const email = session.customer_details?.email?.toLowerCase()
+    if (!email) {
+      console.warn('[stripe-webhook] checkout.session.completed has no client_reference_id and no customer email — skipping')
+      return res.status(200).json({ received: true })
+    }
+
+    const { error } = await supabase
+      .from('stripe_pending_activations')
+      .upsert({ email, plan, stripe_customer_id: customerId ?? null })
+
+    if (error) {
+      console.error(`[stripe-webhook] Failed to store pending activation for ${email}:`, error.message)
+      return res.status(500).send()
+    }
+    console.log(`[stripe-webhook] Stored pending activation for ${email} (${plan})`)
+    return res.status(200).json({ received: true })
   }
 
-  res.status(200).send()
+  // ── customer.subscription.deleted ─────────────────────────────────────────
+  if (event.type === 'customer.subscription.deleted') {
+    const customerId = event.data.object.customer
+
+    if (!supabaseUrl || !serviceRoleKey) {
+      console.error('[stripe-webhook] Missing Supabase env vars')
+      return res.status(500).send()
+    }
+
+    const supabase = createClient(supabaseUrl, serviceRoleKey, {
+      auth: { persistSession: false },
+    })
+
+    const { error } = await supabase
+      .from('user_profiles')
+      .update({ plan: 'free' })
+      .eq('stripe_customer_id', customerId)
+
+    if (error) {
+      console.error(`[stripe-webhook] Failed to downgrade customer ${customerId}:`, error.message)
+      return res.status(500).send()
+    }
+    console.log(`[stripe-webhook] Downgraded customer ${customerId} to free`)
+    return res.status(200).json({ received: true })
+  }
+
+  console.log(`[stripe-webhook] Unhandled event type: ${event.type}`)
+  return res.status(200).json({ received: true })
 }

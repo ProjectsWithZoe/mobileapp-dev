@@ -40,20 +40,35 @@ export function useProfile(userId) {
       .eq('id', userId)
       .single()
 
+    let profile
     if (error?.code === 'PGRST116') {
       const { data: created } = await supabase
         .from('user_profiles')
         .insert({ id: userId })
         .select()
         .single()
-      setProfile(created)
-      setLoading(false)
-      return created
+      profile = created
     } else {
-      setProfile(data)
-      setLoading(false)
-      return data
+      profile = data
     }
+
+    // Claim any pending Stripe activation (guest checkout → sign-up flow)
+    if (profile?.plan === 'free') {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (user?.email) {
+        const { data: claimedPlan } = await supabase.rpc('claim_pending_activation', {
+          p_user_id: userId,
+          p_email: user.email,
+        })
+        if (claimedPlan) {
+          profile = { ...profile, plan: claimedPlan }
+        }
+      }
+    }
+
+    setProfile(profile)
+    setLoading(false)
+    return profile
   }, [userId])
 
   useEffect(() => { load() }, [load])
