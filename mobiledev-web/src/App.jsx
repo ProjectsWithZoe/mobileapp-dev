@@ -2,6 +2,7 @@ import { lazy, Suspense, useState } from 'react'
 import './App.css'
 import { useAuth } from './hooks/useAuth'
 import { getStripeLink } from './lib/stripe'
+import { track } from '@vercel/analytics'
 
 // RunTracker example screenshots — static images, no JS bundle cost
 import example1 from './assets/example1.png'
@@ -149,7 +150,10 @@ export default function App() {
           onDemo={() => openAuth('signup')}
           onSubscribe={(plan) => {
             const link = getStripeLink(plan, user)
-            if (link) window.location.href = link
+            if (link) {
+              track('stripe_redirect', { plan })
+              window.location.href = link
+            }
           }}
         />
         {showAuthModal && (

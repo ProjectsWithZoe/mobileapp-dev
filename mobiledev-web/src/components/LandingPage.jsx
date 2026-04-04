@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { track } from "@vercel/analytics";
 import { Check, Copy, Palette, PenLine, Sparkles, Zap, ArrowRight, X, AlertTriangle, FileCode2, Brain } from "lucide-react";
 import example1 from "../assets/example1.png";
 import example2 from "../assets/example2.png";
@@ -155,7 +156,7 @@ export default function LandingPage({ onSignIn, onGetStarted, onSubscribe, onDem
           </button>
           
           <button
-            onClick={onDemo}
+            onClick={() => { track('demo_open'); onDemo?.(); }}
             className="text-xs font-bold px-4 py-2 rounded-lg text-white transition-all duration-150 active:scale-95"
             style={{ backgroundColor: PURPLE }}
           >
@@ -238,7 +239,7 @@ export default function LandingPage({ onSignIn, onGetStarted, onSubscribe, onDem
         {/* CTAs */}
         <div className="flex flex-col sm:flex-row gap-3 items-center justify-center">
           <button
-            onClick={() => onSubscribe?.("lifetime")}
+            onClick={() => { track('pricing_cta_click', { plan: 'lifetime' }); onSubscribe?.("lifetime"); }}
             className="w-full sm:w-auto flex items-center justify-center gap-2 px-7 py-3.5 rounded-xl font-bold text-sm text-white transition-all duration-150 active:scale-95"
             style={{ backgroundColor: PURPLE }}
           >
@@ -246,7 +247,7 @@ export default function LandingPage({ onSignIn, onGetStarted, onSubscribe, onDem
             <ArrowRight size={15} />
           </button>
           <button
-            onClick={() => onSubscribe?.("monthly")}
+            onClick={() => { track('pricing_cta_click', { plan: 'monthly' }); onSubscribe?.("monthly"); }}
             className="w-full sm:w-auto flex items-center justify-center gap-2 px-7 py-3.5 rounded-xl font-bold text-sm transition-all duration-150 active:scale-95 border"
             style={{ borderColor: `${PURPLE}60`, color: PURPLE, background: "none" }}
           >
@@ -540,7 +541,7 @@ export default function LandingPage({ onSignIn, onGetStarted, onSubscribe, onDem
               ))}
             </ul>
             <button
-              onClick={() => onSubscribe?.("monthly")}
+              onClick={() => { track('pricing_cta_click', { plan: 'monthly' }); onSubscribe?.("monthly"); }}
               className="w-full py-3 rounded-xl font-bold text-sm transition-all duration-150 active:scale-95 border"
               style={{ borderColor: `${PURPLE}60`, color: PURPLE, background: "none" }}
             >
@@ -581,7 +582,7 @@ export default function LandingPage({ onSignIn, onGetStarted, onSubscribe, onDem
               ))}
             </ul>
             <button
-              onClick={() => onSubscribe?.("lifetime")}
+              onClick={() => { track('pricing_cta_click', { plan: 'lifetime' }); onSubscribe?.("lifetime"); }}
               className="w-full py-3 rounded-xl font-bold text-sm text-white transition-all duration-150 active:scale-95"
               style={{ backgroundColor: PURPLE }}
             >
@@ -608,7 +609,7 @@ export default function LandingPage({ onSignIn, onGetStarted, onSubscribe, onDem
             that makes your AI actually produce something worth shipping.
           </p>
           <button
-            onClick={() => onSubscribe?.("lifetime")}
+            onClick={() => { track('pricing_cta_click', { plan: 'lifetime' }); onSubscribe?.("lifetime"); }}
             className="inline-flex items-center gap-2 px-8 py-3.5 rounded-xl font-bold text-sm text-white transition-all duration-150 active:scale-95"
             style={{ backgroundColor: PURPLE }}
           >
