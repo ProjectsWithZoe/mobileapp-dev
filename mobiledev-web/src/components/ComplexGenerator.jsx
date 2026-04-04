@@ -1027,7 +1027,7 @@ export default function PromptGenerator({ demoMode = false, onDemoSignUp, onExit
                   <div className="p-5 rounded-xl border border-gray-700 bg-gray-950 flex flex-col">
                     <p className="text-xs text-gray-500 uppercase tracking-widest mb-3">Monthly</p>
                     <div className="mb-1">
-                      <span className="text-2xl font-bold text-white">$19.99</span>
+                      <span className="text-2xl font-bold text-white">$9.99</span>
                       <span className="text-gray-500 text-xs"> /mo</span>
                     </div>
                     <p className="text-gray-600 text-xs mb-5">Cancel anytime.</p>
@@ -1047,7 +1047,7 @@ export default function PromptGenerator({ demoMode = false, onDemoSignUp, onExit
                     </div>
                     <p className="text-xs uppercase tracking-widest mb-3" style={{ color: "#6C63FF" }}>Lifetime</p>
                     <div className="mb-1">
-                      <span className="text-2xl font-bold text-white">$69.99</span>
+                      <span className="text-2xl font-bold text-white">$49.99</span>
                     </div>
                     <p className="text-gray-400 text-xs mb-5">One-time. Forever.</p>
                     <button

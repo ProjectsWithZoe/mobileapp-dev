@@ -10,9 +10,10 @@ import example3 from './assets/example3.png'
 import example4 from './assets/example4.png'
 
 // Code-split: each route is a separate chunk
-const LandingPage    = lazy(() => import('./components/LandingPage'))
+const LandingPage     = lazy(() => import('./components/LandingPage'))
 const PromptGenerator = lazy(() => import('./components/ComplexGenerator'))
 const AuthModal       = lazy(() => import('./components/AuthModal'))
+const PaymentSuccess  = lazy(() => import('./components/PaymentSuccess'))
 
 const EXAMPLES = [example1, example2, example3, example4]
 
@@ -102,6 +103,16 @@ export default function App() {
   const [isDemoMode, setIsDemoMode] = useState(false)
 
   const openAuth = (mode) => { setAuthMode(mode); setShowAuthModal(true) }
+
+  // Post-payment confirmation page — render before session check so unauthenticated
+  // users also land here correctly (the component handles the no-session case).
+  if (window.location.pathname === '/success') {
+    return (
+      <Suspense fallback={<div className="min-h-screen bg-gray-950" />}>
+        <PaymentSuccess />
+      </Suspense>
+    )
+  }
 
   // While Supabase resolves the existing session, show skeleton to prevent
   // a flash of the landing page for already-signed-in users.

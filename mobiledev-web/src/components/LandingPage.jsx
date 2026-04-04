@@ -125,10 +125,10 @@ function PricingModal({ plan, onClose, onConfirm }) {
         <p className="text-gray-400 text-sm mb-6">
           {isLifetime
             ? "One payment. All future updates included. No subscriptions."
-            : "Full access for $19.99/month. Cancel whenever you want."}
+            : "Full access for $9.99/month. Cancel whenever you want."}
         </p>
         <div className="text-3xl font-bold text-white mb-6">
-          {isLifetime ? "$69.99" : "$19.99"}
+          {isLifetime ? "$49.99" : "$9.99"}
           {!isLifetime && <span className="text-gray-500 text-base font-normal"> /mo</span>}
         </div>
         <p className="text-xs text-gray-600 mb-4">
@@ -162,11 +162,16 @@ export default function LandingPage({ onSignIn, onGetStarted, onSubscribe, onDem
     if (!contactForm.name.trim() || !contactForm.email.trim() || !contactForm.message.trim()) return;
     setContactStatus("sending");
     try {
+      const anonKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_DEFAULT_KEY
+        ?? import.meta.env.VITE_SUPABASE_ANON_KEY;
       const res = await fetch(
         `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/send-contact`,
         {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json",
+            ...(anonKey ? { "Authorization": `Bearer ${anonKey}` } : {}),
+          },
           body: JSON.stringify(contactForm),
         }
       );
@@ -304,7 +309,7 @@ export default function LandingPage({ onSignIn, onGetStarted, onSubscribe, onDem
             className="w-full sm:w-auto flex items-center justify-center gap-2 px-7 py-3.5 rounded-xl font-bold text-sm text-white transition-all duration-150 active:scale-95"
             style={{ backgroundColor: PURPLE }}
           >
-            Get Lifetime Access – $69.99
+            Get Lifetime Access – $49.99
             <ArrowRight size={15} />
           </button>
           <button
@@ -312,7 +317,7 @@ export default function LandingPage({ onSignIn, onGetStarted, onSubscribe, onDem
             className="w-full sm:w-auto flex items-center justify-center gap-2 px-7 py-3.5 rounded-xl font-bold text-sm transition-all duration-150 active:scale-95 border"
             style={{ borderColor: `${PURPLE}60`, color: PURPLE, background: "none" }}
           >
-            Monthly – $19.99 / mo
+            Monthly – $9.99 / mo
           </button>
         </div>
         <p className="text-gray-600 text-xs mt-4">No credit card demos · Cancel monthly anytime</p>
@@ -589,7 +594,7 @@ export default function LandingPage({ onSignIn, onGetStarted, onSubscribe, onDem
           <div className="p-7 rounded-2xl border border-gray-800 bg-gray-900 flex flex-col">
             <p className="text-xs text-gray-500 uppercase tracking-widest mb-4">Monthly</p>
             <div className="mb-1">
-              <span className="text-4xl font-bold text-white">$19.99</span>
+              <span className="text-4xl font-bold text-white">$9.99</span>
               <span className="text-gray-500 text-sm"> / month</span>
             </div>
             <p className="text-gray-600 text-xs mb-7">Billed monthly. Cancel anytime.</p>
@@ -631,7 +636,7 @@ export default function LandingPage({ onSignIn, onGetStarted, onSubscribe, onDem
               </p>
             </div>
             <div className="mb-1">
-              <span className="text-4xl font-bold text-white">$69.99</span>
+              <span className="text-4xl font-bold text-white">$49.99</span>
             </div>
             <p className="text-gray-400 text-xs mb-7">One-time payment. Yours forever.</p>
             <ul className="space-y-3 flex-1 mb-8">
