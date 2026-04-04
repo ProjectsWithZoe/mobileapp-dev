@@ -95,16 +95,16 @@ export default async function handler(req, res) {
 
     // Send activation magic link to the payer's email so they can create their account
     const appUrl = process.env.APP_URL ?? 'https://humble-ui.com'
-    try {
-      await supabase.auth.admin.generateLink({
-        type: 'magiclink',
-        email,
-        options: { redirectTo: appUrl },
-      })
-      console.log(`[stripe-webhook] Activation email sent to ${email}`)
-    } catch (emailErr) {
+    const { data: linkData, error: emailError } = await supabase.auth.admin.generateLink({
+      type: 'magiclink',
+      email,
+      options: { redirectTo: appUrl },
+    })
+    if (emailError) {
       // Non-fatal — log and continue; the pending activation record is already saved
-      console.error(`[stripe-webhook] Failed to send activation email to ${email}:`, emailErr.message)
+      console.error(`[stripe-webhook] Failed to send activation email to ${email}:`, emailError.message)
+    } else {
+      console.log(`[stripe-webhook] Activation email sent to ${email} (user id: ${linkData?.user?.id ?? 'unknown'})`)
     }
 
     return res.status(200).json({ received: true })
