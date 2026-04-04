@@ -105,8 +105,22 @@ export default function App() {
 
   const openAuth = (mode) => { setAuthMode(mode); setShowAuthModal(true) }
 
+  // Called by AuthModal as soon as the OTP email is dispatched (before the user
+  // clicks the magic link). If a plan is pending, redirect to Stripe immediately
+  // using just the email — no client_reference_id yet (webhook stores the
+  // pending activation and claim_pending_activation applies it on sign-in).
+  const handleOtpSent = (email) => {
+    if (!pendingPlan) return
+    const link = getStripeLink(pendingPlan, { email })
+    if (link) {
+      setPendingPlan(null) // clear so the useEffect below doesn't double-redirect
+      window.location.href = link
+    }
+  }
+
   // After auth completes, fulfil any pending Stripe plan the user selected
-  // before signing in/up.
+  // before signing in/up (covers the case where pendingPlan wasn't consumed
+  // by handleOtpSent, e.g. already-signed-in user).
   useEffect(() => {
     if (!user || !pendingPlan) return
     const link = getStripeLink(pendingPlan, user)
@@ -144,6 +158,8 @@ export default function App() {
                 onClose={() => setShowAuthModal(false)}
                 onSignIn={authMode === 'signup' ? signUp : signIn}
                 mode={authMode}
+                onOtpSent={handleOtpSent}
+                hasPendingPlan={!!pendingPlan}
               />
             </Suspense>
           )}
@@ -169,6 +185,8 @@ export default function App() {
               onClose={() => setShowAuthModal(false)}
               onSignIn={authMode === 'signup' ? signUp : signIn}
               mode={authMode}
+              onOtpSent={handleOtpSent}
+              hasPendingPlan={!!pendingPlan}
             />
           </Suspense>
         )}

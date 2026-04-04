@@ -15,7 +15,7 @@ const COPY = {
   },
 }
 
-export default function AuthModal({ onClose, onSignIn, mode = 'signin' }) {
+export default function AuthModal({ onClose, onSignIn, mode = 'signin', onOtpSent, hasPendingPlan = false }) {
   const copy = COPY[mode] ?? COPY.signin
   const [email, setEmail]     = useState('')
   const [sent, setSent]       = useState(false)
@@ -30,12 +30,13 @@ export default function AuthModal({ onClose, onSignIn, mode = 'signin' }) {
     try {
       await onSignIn(email.trim())
       setSent(true)
+      onOtpSent?.(email.trim())
     } catch (err) {
       setError(err.message ?? 'Something went wrong. Please try again.')
     } finally {
       setLoading(false)
     }
-  }, [email, onSignIn])
+  }, [email, onSignIn, onOtpSent])
 
   return (
     /* Backdrop */
@@ -69,10 +70,17 @@ export default function AuthModal({ onClose, onSignIn, mode = 'signin' }) {
             </div>
             <div>
               <p className="text-white font-bold text-sm">Check your inbox</p>
-              <p className="text-gray-500 text-xs mt-1">
-                We sent a magic link to <span className="text-gray-300">{email}</span>.
-                Click it to sign in — no password needed.
-              </p>
+              {hasPendingPlan ? (
+                <p className="text-gray-500 text-xs mt-1">
+                  The payment page is opening now.{' '}
+                  <span className="text-gray-300">Also check {email}</span> — you must click the magic link we just sent to activate your Humble UI account after paying.
+                </p>
+              ) : (
+                <p className="text-gray-500 text-xs mt-1">
+                  We sent a magic link to <span className="text-gray-300">{email}</span>.
+                  Click it to sign in — no password needed.
+                </p>
+              )}
             </div>
             <button
               onClick={onClose}

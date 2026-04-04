@@ -34,7 +34,7 @@ export function useAuth() {
       email,
       options: { emailRedirectTo: appUrl, shouldCreateUser: false },
     })
-    if (error) throw new Error('No account found for this email. Please sign up first.')
+    if (error) throw new Error('No account found for this email. Please sign up first using the Free Demo button.')
   }, [])
 
   // signUp: checks for existing account via RPC first, errors if found, otherwise creates.
