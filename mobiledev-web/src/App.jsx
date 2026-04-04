@@ -1,4 +1,4 @@
-import { lazy, Suspense, useState } from 'react'
+import { lazy, Suspense, useEffect, useState } from 'react'
 import './App.css'
 import { useAuth } from './hooks/useAuth'
 import { getStripeLink } from './lib/stripe'
@@ -101,8 +101,18 @@ export default function App() {
   const [showAuthModal, setShowAuthModal] = useState(false)
   const [authMode, setAuthMode] = useState('signin')
   const [isDemoMode, setIsDemoMode] = useState(false)
+  const [pendingPlan, setPendingPlan] = useState(null)
 
   const openAuth = (mode) => { setAuthMode(mode); setShowAuthModal(true) }
+
+  // After auth completes, fulfil any pending Stripe plan the user selected
+  // before signing in/up.
+  useEffect(() => {
+    if (!user || !pendingPlan) return
+    const link = getStripeLink(pendingPlan, user)
+    setPendingPlan(null)
+    if (link) window.location.href = link
+  }, [user, pendingPlan])
 
   // Post-payment confirmation page — render before session check so unauthenticated
   // users also land here correctly (the component handles the no-session case).
@@ -146,10 +156,11 @@ export default function App() {
         <LandingPage
           onSignIn={() => openAuth('signin')}
           onGetStarted={() => openAuth('signup')}
-          onDemo={() => setIsDemoMode(true)}
+          onDemo={() => openAuth('signup')}
           onSubscribe={(plan) => {
+            if (!user) { setPendingPlan(plan); openAuth('signup'); return }
             const link = getStripeLink(plan, user)
-            if (link) { window.location.href = link } else { openAuth('signup') }
+            if (link) window.location.href = link
           }}
         />
         {showAuthModal && (
