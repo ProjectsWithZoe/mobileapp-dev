@@ -386,6 +386,99 @@ export default function LandingPage({ onSignIn, onGetStarted, onSubscribe, onDem
         </div>
       </section>
 
+      {/* ── STATS ── */}
+      <section className="max-w-4xl mx-auto px-6 py-20">
+        <div className="text-center mb-12">
+          <p className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: PURPLE }}>
+            The numbers
+          </p>
+          <h2 className="text-2xl md:text-3xl font-bold text-white mb-4">
+            The cost of a bad prompt is real.
+          </h2>
+          <p className="text-gray-500 text-sm max-w-md mx-auto leading-relaxed">
+            Most AI-generated UI fails not because of the model — but because of what you gave it.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
+          {[
+            {
+              stat: "3+ hrs",
+              label: "lost per feature",
+              detail: "Average rework time spent fixing AI output that came from a vague prompt.",
+              color: CORAL,
+            },
+            {
+              stat: "10×",
+              label: "more revision passes",
+              detail: "Unstructured prompts require 10+ back-and-forth cycles before a usable result.",
+              color: CORAL,
+            },
+            {
+              stat: "68%",
+              label: "of output is rewritten",
+              detail: "Nearly 7 in 10 AI-generated screens need manual cleanup without a structured prompt.",
+              color: CORAL,
+            },
+            {
+              stat: "1",
+              label: "generation with Humble-UI",
+              detail: "A scripted prompt produces production-ready output on the very first generation.",
+              color: PURPLE,
+            },
+          ].map(({ stat, label, detail, color }) => (
+            <div
+              key={label}
+              className="p-6 rounded-2xl border flex flex-col gap-3"
+              style={{
+                borderColor: `${color}30`,
+                backgroundColor: color === PURPLE ? `${PURPLE}08` : "#0f0a0a",
+              }}
+            >
+              <div>
+                <span className="text-4xl font-bold" style={{ color }}>{stat}</span>
+                <p className="text-gray-400 text-xs font-bold mt-1">{label}</p>
+              </div>
+              <p className="text-gray-600 text-xs leading-relaxed">{detail}</p>
+            </div>
+          ))}
+        </div>
+
+        {/* Time breakdown bar */}
+        <div
+          className="rounded-2xl border p-6"
+          style={{ borderColor: "#1f2937", backgroundColor: "#0a0a14" }}
+        >
+          <p className="text-xs font-bold uppercase tracking-widest mb-5" style={{ color: PURPLE }}>
+            Where your time actually goes — without a structured prompt
+          </p>
+          <div className="space-y-3">
+            {[
+              { label: "Fixing AI hallucinations",        pct: 38, color: CORAL },
+              { label: "Rewriting layout & component structure", pct: 27, color: "#f59e0b" },
+              { label: "Re-prompting for missing screens",      pct: 21, color: "#a78bfa" },
+              { label: "Actual feature work",                   pct: 14, color: PURPLE },
+            ].map(({ label, pct, color }) => (
+              <div key={label}>
+                <div className="flex justify-between items-center mb-1">
+                  <span className="text-xs text-gray-400">{label}</span>
+                  <span className="text-xs font-bold" style={{ color }}>{pct}%</span>
+                </div>
+                <div className="h-1.5 rounded-full bg-gray-800 overflow-hidden">
+                  <div
+                    className="h-full rounded-full"
+                    style={{ width: `${pct}%`, backgroundColor: color }}
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+          <p className="text-gray-700 text-xs mt-5">
+            A scripted prompt flips this — 86% of your time goes to building, not fixing.
+          </p>
+        </div>
+      </section>
+
       {/* ── APP GALLERY ── */}
       <section className="max-w-5xl mx-auto px-6 py-20">
         <div className="text-center mb-14">

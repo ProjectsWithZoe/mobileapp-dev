@@ -24,9 +24,6 @@
  *   create policy "own prompts select" on generated_prompts
  *     for select using (auth.uid() = user_id);
  *
- *   -- Service role (used by api/log-demo-prompt.js) bypasses RLS automatically.
- *   -- No extra policy needed for demo inserts.
- *
  * If the table already exists with user_id NOT NULL, run:
  *   alter table generated_prompts alter column user_id drop not null;
  */
@@ -70,31 +67,5 @@ export function useGeneratedPrompts(userId) {
    * Supabase service role key. Stores user_id = null.
    * Fire-and-forget: failures are logged, never shown to the user.
    */
-  const logDemoPrompt = useCallback(async ({
-    app_idea,
-    use_case,
-    palette_name,
-    complexity,
-    extra_context,
-    prompt_text,
-  }) => {
-    try {
-      await fetch('/api/log-demo-prompt', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          app_idea,
-          use_case,
-          palette_name,
-          complexity,
-          extra_context: extra_context ?? '',
-          prompt_text,
-        }),
-      })
-    } catch (err) {
-      console.error('[logDemoPrompt] request failed:', err)
-    }
-  }, [])
-
-  return { insertPrompt, logDemoPrompt }
+  return { insertPrompt }
 }

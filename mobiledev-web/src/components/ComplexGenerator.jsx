@@ -425,7 +425,7 @@ export default function PromptGenerator({ demoMode = false, onDemoSignUp, onExit
   // Auth & save state
   const { user, loading: authLoading, signIn, signOut } = useAuth();
   const { prompts, loading: promptsLoading, savePrompt, deletePrompt } = useSavedPrompts(user?.id);
-  const { insertPrompt, logDemoPrompt } = useGeneratedPrompts(user?.id);
+  const { insertPrompt } = useGeneratedPrompts(user?.id);
   const { isPaid, withinLimit, generationsUsed, incrementGeneration, loading: profileLoading, profile } = useProfile(user?.id);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
@@ -526,15 +526,6 @@ export default function PromptGenerator({ demoMode = false, onDemoSignUp, onExit
 
     if (demoMode) {
       localStorage.setItem(DEMO_STORAGE_KEY, "true");
-      // Log the demo generation server-side (fire-and-forget — don't await)
-      logDemoPrompt({
-        app_idea: appIdea,
-        use_case: selectedUseCase,
-        palette_name: palette.name,
-        complexity: selectedComplexity,
-        extra_context: extraContext,
-        prompt_text: prompt,
-      });
       // Show paywall after a beat so the user can see their generated prompt first
       setTimeout(() => setShowUpgradeModal(true), 900);
     } else {
@@ -550,7 +541,7 @@ export default function PromptGenerator({ demoMode = false, onDemoSignUp, onExit
         }),
       ]);
     }
-  }, [appIdea, selectedUseCase, selectedComplexity, palette, complexity, styleTokens, extraContext, canGenerate, withinLimit, demoMode, incrementGeneration, insertPrompt, logDemoPrompt]);
+  }, [appIdea, selectedUseCase, selectedComplexity, palette, complexity, styleTokens, extraContext, canGenerate, withinLimit, demoMode, incrementGeneration, insertPrompt]);
 
   const copyToClipboard = useCallback(() => {
     navigator.clipboard.writeText(generatedPrompt);
