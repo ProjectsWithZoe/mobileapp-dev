@@ -30,3 +30,4 @@ mobiledev-web/src/components/mobile-prompt-generator.jsx
 *.example
 .vercel
 .env*.local
+ads-preview.html

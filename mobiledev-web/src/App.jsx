@@ -15,6 +15,7 @@ const LandingPage     = lazy(() => import('./components/LandingPage'))
 const PromptGenerator = lazy(() => import('./components/ComplexGenerator'))
 const AuthModal       = lazy(() => import('./components/AuthModal'))
 const PaymentSuccess  = lazy(() => import('./components/PaymentSuccess'))
+const CookieBanner    = lazy(() => import('./components/CookieBanner'))
 
 const EXAMPLES = [example1, example2, example3, example4]
 
@@ -138,6 +139,7 @@ export default function App() {
               />
             </Suspense>
           )}
+          <Suspense fallback={null}><CookieBanner /></Suspense>
         </Suspense>
       )
     }
@@ -165,6 +167,7 @@ export default function App() {
             />
           </Suspense>
         )}
+        <Suspense fallback={null}><CookieBanner /></Suspense>
       </Suspense>
     )
   }
@@ -176,6 +179,9 @@ export default function App() {
         <PromptGenerator />
       </Suspense>
       <ExamplesGallery />
+      <Suspense fallback={null}>
+        <CookieBanner />
+      </Suspense>
     </div>
   )
 }

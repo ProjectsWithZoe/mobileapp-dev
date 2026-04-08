@@ -1,0 +1,1005 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Privacy Policy — Humble-UI</title>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --purple: #6C63FF;
+      --coral:  #FF6584;
+      --bg:     #080810;
+      --surface: #0d0d1a;
+      --border: #1f2937;
+      --text:   #e5e7eb;
+      --muted:  #9ca3af;
+      --dim:    #4b5563;
+      --font:   'IBM Plex Mono', monospace;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font);
+      font-size: 14px;
+      line-height: 1.8;
+      min-height: 100vh;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      text-decoration: none;
+    }
+
+    .logo-icon {
+      width: 26px;
+      height: 26px;
+      background: var(--purple);
+      border-radius: 7px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      color: #fff;
+    }
+
+    .logo-name { color: #fff; font-size: 13px; font-weight: 700; }
+
+    .nav-back {
+      color: var(--dim);
+      font-size: 11px;
+      text-decoration: none;
+      letter-spacing: 0.05em;
+      transition: color .15s;
+    }
+
+    .nav-back:hover { color: var(--text); }
+
+    /* ── LAYOUT ── */
+    .page {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 56px 32px 100px;
+    }
+
+    /* ── HEADER ── */
+    .page-header {
+      margin-bottom: 48px;
+      padding-bottom: 32px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .page-eyebrow {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--purple);
+      margin-bottom: 14px;
+    }
+
+    .page-title {
+      font-size: 28px;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: -0.01em;
+      margin-bottom: 12px;
+    }
+
+    .page-meta {
+      font-size: 12px;
+      color: var(--dim);
+    }
+
+    .page-meta span {
+      color: var(--muted);
+    }
+
+    /* ── TOC ── */
+    .toc {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 24px 28px;
+      margin-bottom: 48px;
+    }
+
+    .toc-title {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--dim);
+      margin-bottom: 14px;
+    }
+
+    .toc ol {
+      list-style: none;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px 24px;
+    }
+
+    .toc li { counter-increment: toc; }
+
+    .toc a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 12px;
+      transition: color .15s;
+      display: flex;
+      align-items: baseline;
+      gap: 7px;
+    }
+
+    .toc a::before {
+      content: counter(toc, decimal-leading-zero);
+      font-size: 10px;
+      color: var(--dim);
+      flex-shrink: 0;
+    }
+
+    .toc a:hover { color: #fff; }
+
+    /* ── SECTIONS ── */
+    section {
+      margin-bottom: 52px;
+      scroll-margin-top: 72px;
+    }
+
+    .section-num {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--purple);
+      margin-bottom: 6px;
+    }
+
+    h2 {
+      font-size: 18px;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 18px;
+      letter-spacing: -0.01em;
+    }
+
+    h3 {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text);
+      margin: 22px 0 8px;
+      letter-spacing: 0.01em;
+    }
+
+    p {
+      color: var(--muted);
+      margin-bottom: 14px;
+      font-size: 13px;
+    }
+
+    p:last-child { margin-bottom: 0; }
+
+    a { color: var(--purple); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    /* ── DATA TABLE ── */
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 16px 0 20px;
+      font-size: 12px;
+    }
+
+    .data-table th {
+      text-align: left;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--dim);
+      padding: 8px 12px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .data-table td {
+      padding: 10px 12px;
+      color: var(--muted);
+      border-bottom: 1px solid #111827;
+      vertical-align: top;
+    }
+
+    .data-table tr:last-child td { border-bottom: none; }
+
+    .data-table td:first-child { color: var(--text); font-weight: 600; width: 30%; }
+
+    /* ── THIRD-PARTY CARDS ── */
+    .vendor-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin: 16px 0;
+    }
+
+    .vendor-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+    }
+
+    .vendor-name {
+      font-size: 12px;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 4px;
+    }
+
+    .vendor-role {
+      font-size: 10px;
+      color: var(--dim);
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    .vendor-desc {
+      font-size: 11px;
+      color: var(--muted);
+      line-height: 1.6;
+      margin-bottom: 8px;
+    }
+
+    .vendor-link {
+      font-size: 10px;
+      color: var(--purple);
+    }
+
+    /* ── RIGHTS LIST ── */
+    .rights-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin: 16px 0;
+    }
+
+    .right-item {
+      display: flex;
+      gap: 14px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px 16px;
+    }
+
+    .right-icon {
+      font-size: 16px;
+      flex-shrink: 0;
+      line-height: 1.6;
+    }
+
+    .right-title {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 3px;
+    }
+
+    .right-desc {
+      font-size: 11px;
+      color: var(--muted);
+      line-height: 1.6;
+      margin: 0;
+    }
+
+    /* ── CALLOUT ── */
+    .callout {
+      background: #6C63FF0d;
+      border: 1px solid #6C63FF30;
+      border-radius: 12px;
+      padding: 16px 18px;
+      margin: 16px 0;
+    }
+
+    .callout p {
+      font-size: 12px;
+      color: var(--muted);
+      margin: 0;
+    }
+
+    .callout strong { color: var(--text); }
+
+    .callout.warn {
+      background: #FF65840d;
+      border-color: #FF658430;
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 28px 32px;
+      text-align: center;
+    }
+
+    .footer-logo {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    .footer-logo-icon {
+      width: 20px;
+      height: 20px;
+      background: var(--purple);
+      border-radius: 5px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      color: #fff;
+    }
+
+    .footer-logo-name { color: #fff; font-size: 12px; font-weight: 700; }
+    .footer-copy { color: var(--dim); font-size: 11px; }
+
+    @media (max-width: 600px) {
+      .page { padding: 40px 20px 80px; }
+      nav { padding: 14px 20px; }
+      .toc ol { grid-template-columns: 1fr; }
+      .vendor-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <a href="/" class="nav-logo">
+      <div class="logo-icon">✦</div>
+      <span class="logo-name">Humble-UI</span>
+    </a>
+    <a href="/" class="nav-back">← Back to app</a>
+  </nav>
+
+  <div class="page">
+
+    <div class="page-header">
+      <p class="page-eyebrow">Legal</p>
+      <h1 class="page-title">Privacy Policy</h1>
+      <p class="page-meta">
+        Effective date: <span>9 April 2025</span> &nbsp;·&nbsp; Last updated: <span>9 April 2025</span>
+      </p>
+    </div>
+
+    <div class="toc">
+      <p class="toc-title">Contents</p>
+      <ol style="counter-reset: toc;">
+        <li><a href="#s1">Who we are</a></li>
+        <li><a href="#s2">Information we collect</a></li>
+        <li><a href="#s3">How we use your information</a></li>
+        <li><a href="#s4">Legal basis for processing</a></li>
+        <li><a href="#s5">Third-party services</a></li>
+        <li><a href="#s6">Cookies &amp; local storage</a></li>
+        <li><a href="#s7">Data retention</a></li>
+        <li><a href="#s8">Your rights</a></li>
+        <li><a href="#s9">International transfers</a></li>
+        <li><a href="#s10">Children's privacy</a></li>
+        <li><a href="#s11">Security</a></li>
+        <li><a href="#s12">Changes to this policy</a></li>
+        <li><a href="#s13">Contact us</a></li>
+      </ol>
+    </div>
+
+    <!-- 1 -->
+    <section id="s1">
+      <p class="section-num">01</p>
+      <h2>Who we are</h2>
+      <p>
+        Humble-UI ("<strong>we</strong>", "<strong>us</strong>", or "<strong>our</strong>") operates the website
+        <a href="https://humble-ui.com">humble-ui.com</a> and its associated subdomains (the "<strong>Service</strong>").
+        The Service provides an AI prompt engineering tool that generates structured prompts for producing UI mockups.
+      </p>
+      <p>
+        We are the data controller responsible for your personal information collected through the Service.
+        For any privacy-related questions, please contact us at
+        <a href="mailto:support@humble-ui.co.uk">support@humble-ui.co.uk</a>.
+      </p>
+    </section>
+
+    <!-- 2 -->
+    <section id="s2">
+      <p class="section-num">02</p>
+      <h2>Information we collect</h2>
+
+      <h3>Information you provide directly</h3>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Data</th>
+            <th>When collected</th>
+            <th>Why</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Email address</td>
+            <td>Account sign-up or sign-in</td>
+            <td>To authenticate you via magic link. We do not collect passwords.</td>
+          </tr>
+          <tr>
+            <td>Contact form inputs</td>
+            <td>When you submit the contact form (name, email, message)</td>
+            <td>To respond to your enquiry. Stored in our database and forwarded to us by email.</td>
+          </tr>
+          <tr>
+            <td>App idea &amp; prompt settings</td>
+            <td>When you use the prompt generator (app idea, use case, palette, complexity, extra context)</td>
+            <td>To generate your prompt. Saved to your account if you choose to save; otherwise discarded after generation.</td>
+          </tr>
+          <tr>
+            <td>Saved prompt names</td>
+            <td>When you explicitly save a prompt</td>
+            <td>To allow you to retrieve prompts later.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>Information collected automatically</h3>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Data</th>
+            <th>Source</th>
+            <th>Why</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Browser &amp; device type</td>
+            <td>Analytics (PostHog, Vercel Analytics)</td>
+            <td>To understand how the Service is used and to improve it.</td>
+          </tr>
+          <tr>
+            <td>Pages visited, clicks, session duration</td>
+            <td>Analytics (PostHog)</td>
+            <td>To identify usage patterns and product improvements.</td>
+          </tr>
+          <tr>
+            <td>Web vitals (LCP, CLS, FID)</td>
+            <td>Vercel Analytics</td>
+            <td>To monitor and improve page performance.</td>
+          </tr>
+          <tr>
+            <td>Error reports &amp; stack traces</td>
+            <td>Sentry</td>
+            <td>To detect and fix bugs. May include browser, OS, and the URL at the time of error.</td>
+          </tr>
+          <tr>
+            <td>IP address</td>
+            <td>Server logs, rate-limiting</td>
+            <td>Used transiently for abuse prevention (rate limiting on API endpoints). Not stored permanently.</td>
+          </tr>
+          <tr>
+            <td>Stripe customer ID</td>
+            <td>Stripe webhook on payment completion</td>
+            <td>To link your Stripe subscription to your account and manage plan status.</td>
+          </tr>
+          <tr>
+            <td>Plan &amp; generation count</td>
+            <td>Created on first sign-in; updated on payment</td>
+            <td>To enforce plan limits and display your account status.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>Information we do not collect</h3>
+      <p>
+        We do not collect or store payment card details. All payment processing is handled directly by
+        Stripe, which is PCI-DSS Level 1 certified. We receive only a Stripe customer reference ID upon
+        successful payment.
+      </p>
+      <p>
+        We do not collect passwords. Authentication is entirely passwordless via magic links sent to your
+        email address.
+      </p>
+    </section>
+
+    <!-- 3 -->
+    <section id="s3">
+      <p class="section-num">03</p>
+      <h2>How we use your information</h2>
+
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Purpose</th>
+            <th>Data used</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Providing the Service</td>
+            <td>Email (authentication), prompt inputs (generation), saved prompts (retrieval), plan status (feature access)</td>
+          </tr>
+          <tr>
+            <td>Processing payments</td>
+            <td>Email (Stripe prefill), Stripe customer ID, plan assignment</td>
+          </tr>
+          <tr>
+            <td>Sending transactional emails</td>
+            <td>Email address — magic links, payment activation links</td>
+          </tr>
+          <tr>
+            <td>Responding to enquiries</td>
+            <td>Name, email, message from contact form</td>
+          </tr>
+          <tr>
+            <td>Monitoring &amp; improving the Service</td>
+            <td>Analytics events, error reports, performance metrics</td>
+          </tr>
+          <tr>
+            <td>Preventing abuse</td>
+            <td>IP address (transient, rate limiting only)</td>
+          </tr>
+          <tr>
+            <td>Legal compliance</td>
+            <td>Any data necessary to meet applicable legal obligations</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="callout">
+        <p>
+          <strong>We do not sell your personal data.</strong> We do not share your data with third parties
+          for their own marketing purposes. Data is shared only with sub-processors listed in Section 5
+          to operate the Service.
+        </p>
+      </div>
+    </section>
+
+    <!-- 4 -->
+    <section id="s4">
+      <p class="section-num">04</p>
+      <h2>Legal basis for processing (GDPR)</h2>
+      <p>
+        If you are located in the United Kingdom or European Economic Area, we process your personal data
+        under the following legal bases:
+      </p>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Processing activity</th>
+            <th>Legal basis</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Account creation &amp; authentication</td>
+            <td>Performance of a contract (Article 6(1)(b) UK GDPR)</td>
+          </tr>
+          <tr>
+            <td>Providing prompt generation &amp; saving</td>
+            <td>Performance of a contract (Article 6(1)(b))</td>
+          </tr>
+          <tr>
+            <td>Payment processing &amp; plan management</td>
+            <td>Performance of a contract (Article 6(1)(b))</td>
+          </tr>
+          <tr>
+            <td>Sending magic links &amp; transactional emails</td>
+            <td>Performance of a contract (Article 6(1)(b))</td>
+          </tr>
+          <tr>
+            <td>Responding to contact form messages</td>
+            <td>Legitimate interests — responding to your enquiry (Article 6(1)(f))</td>
+          </tr>
+          <tr>
+            <td>Product analytics (PostHog, Vercel Analytics)</td>
+            <td>Legitimate interests — improving the Service (Article 6(1)(f))</td>
+          </tr>
+          <tr>
+            <td>Error monitoring (Sentry)</td>
+            <td>Legitimate interests — maintaining service stability (Article 6(1)(f))</td>
+          </tr>
+          <tr>
+            <td>Abuse prevention (rate limiting)</td>
+            <td>Legitimate interests — protecting the Service (Article 6(1)(f))</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- 5 -->
+    <section id="s5">
+      <p class="section-num">05</p>
+      <h2>Third-party services</h2>
+      <p>
+        We use the following sub-processors to operate the Service. Each is bound by their own privacy
+        policy and, where applicable, a Data Processing Agreement with us.
+      </p>
+
+      <div class="vendor-grid">
+        <div class="vendor-card">
+          <div class="vendor-name">Supabase</div>
+          <div class="vendor-role">Authentication &amp; Database</div>
+          <div class="vendor-desc">
+            Stores your account, profile, saved prompts, generated prompts, and contact submissions.
+            Handles passwordless magic-link authentication.
+          </div>
+          <a class="vendor-link" href="https://supabase.com/privacy" target="_blank" rel="noopener">Privacy policy →</a>
+        </div>
+
+        <div class="vendor-card">
+          <div class="vendor-name">Stripe</div>
+          <div class="vendor-role">Payment Processing</div>
+          <div class="vendor-desc">
+            Processes all subscription and one-time payments. We receive only a customer reference ID
+            and email after checkout. Card data never touches our servers.
+          </div>
+          <a class="vendor-link" href="https://stripe.com/privacy" target="_blank" rel="noopener">Privacy policy →</a>
+        </div>
+
+        <div class="vendor-card">
+          <div class="vendor-name">Resend</div>
+          <div class="vendor-role">Transactional Email</div>
+          <div class="vendor-desc">
+            Sends magic-link authentication emails, payment activation emails, and contact form
+            notification emails. Receives your email address and message content.
+          </div>
+          <a class="vendor-link" href="https://resend.com/privacy" target="_blank" rel="noopener">Privacy policy →</a>
+        </div>
+
+        <div class="vendor-card">
+          <div class="vendor-name">PostHog</div>
+          <div class="vendor-role">Product Analytics</div>
+          <div class="vendor-desc">
+            Tracks anonymised usage events (page views, button clicks, prompt generations) to help us
+            understand and improve the product.
+          </div>
+          <a class="vendor-link" href="https://posthog.com/privacy" target="_blank" rel="noopener">Privacy policy →</a>
+        </div>
+
+        <div class="vendor-card">
+          <div class="vendor-name">Sentry</div>
+          <div class="vendor-role">Error Monitoring</div>
+          <div class="vendor-desc">
+            Captures application errors and stack traces to help us identify and fix bugs. May include
+            browser, OS version, and the URL at the time of the error.
+          </div>
+          <a class="vendor-link" href="https://sentry.io/privacy/" target="_blank" rel="noopener">Privacy policy →</a>
+        </div>
+
+        <div class="vendor-card">
+          <div class="vendor-name">Vercel</div>
+          <div class="vendor-role">Hosting &amp; Analytics</div>
+          <div class="vendor-desc">
+            Hosts the Service and collects anonymous web vitals (LCP, CLS, FID) for performance
+            monitoring. No personal data is stored by Vercel Analytics.
+          </div>
+          <a class="vendor-link" href="https://vercel.com/legal/privacy-policy" target="_blank" rel="noopener">Privacy policy →</a>
+        </div>
+      </div>
+
+      <p>
+        We do not use any advertising networks, ad-tech platforms, or data brokers.
+      </p>
+    </section>
+
+    <!-- 6 -->
+    <section id="s6">
+      <p class="section-num">06</p>
+      <h2>Cookies &amp; local storage</h2>
+
+      <h3>Cookies</h3>
+      <p>
+        We use a small number of cookies necessary to operate the Service. We do not use advertising
+        cookies or third-party tracking cookies.
+      </p>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Cookie</th>
+            <th>Type</th>
+            <th>Purpose</th>
+            <th>Duration</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>sb-*-auth-token</td>
+            <td>Strictly necessary</td>
+            <td>Stores your Supabase authentication session so you remain signed in.</td>
+            <td>Session / up to 1 year</td>
+          </tr>
+          <tr>
+            <td>ph_* (PostHog)</td>
+            <td>Analytics</td>
+            <td>Anonymous identifier used by PostHog to distinguish sessions. No personal data stored.</td>
+            <td>1 year</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>Local storage</h3>
+      <p>
+        We store one item in your browser's local storage:
+      </p>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Key</th>
+            <th>Value</th>
+            <th>Purpose</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>humble_demo_used</td>
+            <td>"true" or absent</td>
+            <td>Records whether you have used your free demo generation. This is stored only on your device and is never sent to our servers.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <p>
+        You can clear cookies and local storage at any time through your browser settings. Clearing the
+        Supabase session cookie will sign you out of the Service. Clearing
+        <code>humble_demo_used</code> will reset your free demo allowance.
+      </p>
+    </section>
+
+    <!-- 7 -->
+    <section id="s7">
+      <p class="section-num">07</p>
+      <h2>Data retention</h2>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Data</th>
+            <th>Retained for</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Account &amp; profile data</td>
+            <td>Until you request deletion or your account is deleted. Deleted within 30 days of request.</td>
+          </tr>
+          <tr>
+            <td>Saved prompts</td>
+            <td>Until you delete them or your account is deleted.</td>
+          </tr>
+          <tr>
+            <td>Generated prompt logs</td>
+            <td>90 days from generation, then automatically purged.</td>
+          </tr>
+          <tr>
+            <td>Contact form submissions</td>
+            <td>12 months from receipt, then deleted.</td>
+          </tr>
+          <tr>
+            <td>Payment records (Stripe)</td>
+            <td>Retained by Stripe per their legal obligations (typically 7 years for financial records). We retain only the Stripe customer ID and plan status.</td>
+          </tr>
+          <tr>
+            <td>Error logs (Sentry)</td>
+            <td>90 days.</td>
+          </tr>
+          <tr>
+            <td>Analytics events (PostHog)</td>
+            <td>12 months.</td>
+          </tr>
+          <tr>
+            <td>IP addresses (rate limiting)</td>
+            <td>In-memory only. Cleared when the server restarts. Not written to persistent storage.</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- 8 -->
+    <section id="s8">
+      <p class="section-num">08</p>
+      <h2>Your rights</h2>
+      <p>
+        Depending on where you are located, you may have the following rights regarding your personal data.
+        To exercise any of them, email us at
+        <a href="mailto:support@humble-ui.co.uk">support@humble-ui.co.uk</a>.
+        We will respond within 30 days.
+      </p>
+
+      <div class="rights-list">
+        <div class="right-item">
+          <div class="right-icon">👁</div>
+          <div>
+            <div class="right-title">Right of access</div>
+            <p class="right-desc">Request a copy of the personal data we hold about you.</p>
+          </div>
+        </div>
+        <div class="right-item">
+          <div class="right-icon">✏️</div>
+          <div>
+            <div class="right-title">Right to rectification</div>
+            <p class="right-desc">Ask us to correct inaccurate or incomplete personal data.</p>
+          </div>
+        </div>
+        <div class="right-item">
+          <div class="right-icon">🗑</div>
+          <div>
+            <div class="right-title">Right to erasure</div>
+            <p class="right-desc">
+              Request deletion of your account and associated personal data. Note that Stripe retains
+              financial records for the period required by law independently of this request.
+            </p>
+          </div>
+        </div>
+        <div class="right-item">
+          <div class="right-icon">⏸</div>
+          <div>
+            <div class="right-title">Right to restrict processing</div>
+            <p class="right-desc">Ask us to pause processing your data in certain circumstances.</p>
+          </div>
+        </div>
+        <div class="right-item">
+          <div class="right-icon">📦</div>
+          <div>
+            <div class="right-title">Right to data portability</div>
+            <p class="right-desc">
+              Receive your personal data in a structured, machine-readable format (where technically feasible).
+            </p>
+          </div>
+        </div>
+        <div class="right-item">
+          <div class="right-icon">🚫</div>
+          <div>
+            <div class="right-title">Right to object</div>
+            <p class="right-desc">
+              Object to processing based on legitimate interests, such as analytics. Where you object to
+              analytics, we will cease processing for that purpose.
+            </p>
+          </div>
+        </div>
+        <div class="right-item">
+          <div class="right-icon">⚖️</div>
+          <div>
+            <div class="right-title">Right to lodge a complaint</div>
+            <p class="right-desc">
+              If you are in the UK, you may complain to the
+              <a href="https://ico.org.uk" target="_blank" rel="noopener">Information Commissioner's Office (ICO)</a>.
+              If you are in the EEA, you may contact your local supervisory authority.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 9 -->
+    <section id="s9">
+      <p class="section-num">09</p>
+      <h2>International data transfers</h2>
+      <p>
+        Some of our sub-processors are based in the United States. Where personal data is transferred
+        from the UK or EEA to the US, such transfers are made under appropriate safeguards:
+      </p>
+      <ul style="list-style:none; display:flex; flex-direction:column; gap:6px; margin:12px 0 16px; font-size:13px; color:var(--muted);">
+        <li style="display:flex; gap:8px;"><span style="color:var(--purple)">→</span> <strong style="color:var(--text)">Supabase</strong> — Standard Contractual Clauses (SCCs) and UK International Data Transfer Agreement (IDTA)</li>
+        <li style="display:flex; gap:8px;"><span style="color:var(--purple)">→</span> <strong style="color:var(--text)">Stripe</strong> — SCCs; Stripe is also certified under the EU–US Data Privacy Framework</li>
+        <li style="display:flex; gap:8px;"><span style="color:var(--purple)">→</span> <strong style="color:var(--text)">PostHog</strong> — SCCs (EU-hosted deployment available; we use the US cloud)</li>
+        <li style="display:flex; gap:8px;"><span style="color:var(--purple)">→</span> <strong style="color:var(--text)">Sentry</strong> — SCCs</li>
+        <li style="display:flex; gap:8px;"><span style="color:var(--purple)">→</span> <strong style="color:var(--text)">Resend</strong> — SCCs</li>
+        <li style="display:flex; gap:8px;"><span style="color:var(--purple)">→</span> <strong style="color:var(--text)">Vercel</strong> — SCCs; US-based hosting with edge network</li>
+      </ul>
+      <p>
+        You may request a copy of the relevant transfer safeguards by emailing
+        <a href="mailto:support@humble-ui.co.uk">support@humble-ui.co.uk</a>.
+      </p>
+    </section>
+
+    <!-- 10 -->
+    <section id="s10">
+      <p class="section-num">10</p>
+      <h2>Children's privacy</h2>
+      <p>
+        The Service is not directed to children under the age of 13 (or 16 in the EEA and UK where
+        applicable). We do not knowingly collect personal data from children. If you believe we have
+        inadvertently collected data from a child, please contact us immediately at
+        <a href="mailto:support@humble-ui.co.uk">support@humble-ui.co.uk</a> and we will delete it promptly.
+      </p>
+    </section>
+
+    <!-- 11 -->
+    <section id="s11">
+      <p class="section-num">11</p>
+      <h2>Security</h2>
+      <p>
+        We implement appropriate technical and organisational measures to protect your personal data:
+      </p>
+      <ul style="list-style:none; display:flex; flex-direction:column; gap:6px; margin:12px 0; font-size:13px; color:var(--muted);">
+        <li style="display:flex; gap:8px;"><span style="color:var(--purple)">→</span> All data in transit is encrypted via TLS 1.2+.</li>
+        <li style="display:flex; gap:8px;"><span style="color:var(--purple)">→</span> Data at rest is encrypted by Supabase (AES-256).</li>
+        <li style="display:flex; gap:8px;"><span style="color:var(--purple)">→</span> Row Level Security (RLS) is enforced on all database tables — users can only access their own data.</li>
+        <li style="display:flex; gap:8px;"><span style="color:var(--purple)">→</span> Passwordless authentication eliminates credential-stuffing and password-breach risks.</li>
+        <li style="display:flex; gap:8px;"><span style="color:var(--purple)">→</span> Stripe webhook signatures are verified on every incoming request; requests with invalid or missing signatures are rejected.</li>
+        <li style="display:flex; gap:8px;"><span style="color:var(--purple)">→</span> Service role keys (which bypass RLS) are never exposed to the browser — they are used only in server-side functions.</li>
+        <li style="display:flex; gap:8px;"><span style="color:var(--purple)">→</span> Rate limiting is applied to all public API endpoints to mitigate abuse.</li>
+        <li style="display:flex; gap:8px;"><span style="color:var(--purple)">→</span> Content Security Policy (CSP) headers are set on all responses to mitigate XSS attacks.</li>
+      </ul>
+      <div class="callout warn">
+        <p>
+          <strong>No method of transmission or storage is 100% secure.</strong> While we take security seriously,
+          we cannot guarantee absolute security. If you discover a vulnerability, please report it responsibly
+          to <a href="mailto:support@humble-ui.co.uk">support@humble-ui.co.uk</a>.
+        </p>
+      </div>
+    </section>
+
+    <!-- 12 -->
+    <section id="s12">
+      <p class="section-num">12</p>
+      <h2>Changes to this policy</h2>
+      <p>
+        We may update this Privacy Policy from time to time. When we make material changes, we will update
+        the "Last updated" date at the top of this page and, where required by law, notify you by email.
+      </p>
+      <p>
+        Your continued use of the Service after changes are posted constitutes acceptance of the revised
+        policy. We encourage you to review this page periodically.
+      </p>
+    </section>
+
+    <!-- 13 -->
+    <section id="s13">
+      <p class="section-num">13</p>
+      <h2>Contact us</h2>
+      <p>
+        If you have any questions about this Privacy Policy or how we handle your data, please contact us:
+      </p>
+      <div class="callout">
+        <p>
+          <strong>Email:</strong> <a href="mailto:support@humble-ui.co.uk">support@humble-ui.co.uk</a><br/>
+          <strong>Website:</strong> <a href="https://humble-ui.com">humble-ui.com</a><br/>
+          <strong>Response time:</strong> We aim to respond to all privacy requests within 30 days.
+        </p>
+      </div>
+      <p>
+        If you are not satisfied with our response, you have the right to complain to the
+        <a href="https://ico.org.uk/make-a-complaint/" target="_blank" rel="noopener">UK Information Commissioner's Office (ICO)</a>
+        or your local data protection authority.
+      </p>
+    </section>
+
+  </div>
+
+  <footer>
+    <div class="footer-logo">
+      <div class="footer-logo-icon">✦</div>
+      <span class="footer-logo-name">Humble-UI</span>
+    </div>
+    <p class="footer-copy">© 2025 Humble-UI. All rights reserved.</p>
+    <div style="display:flex;justify-content:center;gap:20px;margin-top:8px;">
+      <a href="/privacy.html" style="color:#4b5563;font-size:11px;text-decoration:none;">Privacy Policy</a>
+      <a href="/terms.html"   style="color:#4b5563;font-size:11px;text-decoration:none;">Terms &amp; Conditions</a>
+    </div>
+  </footer>
+
+</body>
+</html>

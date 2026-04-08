@@ -1,10 +1,26 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
+// In-memory rate limiter: 5 requests per IP per 60 seconds
+const rateLimitMap = new Map<string, { count: number; resetAt: number }>()
+const RATE_LIMIT = 5
+const RATE_WINDOW_MS = 60_000
+
+function isRateLimited(ip: string): boolean {
+  const now = Date.now()
+  const record = rateLimitMap.get(ip)
+  if (!record || record.resetAt < now) {
+    rateLimitMap.set(ip, { count: 1, resetAt: now + RATE_WINDOW_MS })
+    return false
+  }
+  if (record.count >= RATE_LIMIT) return true
+  record.count++
+  return false
+}
+
 const ALLOWED_ORIGINS = [
-  'http://localhost:5174',
-  'http://localhost:5173',
   'https://humble-ui.vercel.app',
   'https://humble-ui.co.uk',
+  'https://humble-ui.com',
 ]
 
 function corsHeaders(req: Request) {
@@ -24,6 +40,13 @@ Deno.serve(async (req) => {
 
   if (req.method !== 'POST') {
     return new Response('Method not allowed', { status: 405, headers: corsHeaders(req) })
+  }
+
+  const ip = req.headers.get('x-forwarded-for')?.split(',')[0].trim() ?? 'unknown'
+  if (isRateLimited(ip)) {
+    return new Response(JSON.stringify({ error: 'Too many requests. Please wait a minute.' }), {
+      status: 429, headers: { 'Content-Type': 'application/json', ...corsHeaders(req) },
+    })
   }
 
   let name: string, email: string, message: string

@@ -723,7 +723,12 @@ export default function LandingPage({ onSignIn, onGetStarted, onSubscribe, onDem
           <span className="text-white text-xs font-bold">Humble-UI</span>
         </div>
         <p className="text-gray-700 text-xs">
-          © {new Date().getFullYear()} Humble-UI. All rights reserved.
+          © {new Date().getFullYear()} Humble-UI. All rights reserved.{" "}
+          <a href="/privacy.html" className="hover:text-gray-400 transition-colors" style={{ color: "#374151" }}>Privacy Policy</a>
+          {" · "}
+          <a href="/terms.html" className="hover:text-gray-400 transition-colors" style={{ color: "#374151" }}>Terms</a>
+          {" · "}
+          <a href="/cookie-policy.html" className="hover:text-gray-400 transition-colors" style={{ color: "#374151" }}>Cookie Policy</a>
         </p>
       </footer>
 

@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Terms &amp; Conditions — Humble-UI</title>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --purple: #6C63FF;
+      --coral:  #FF6584;
+      --bg:     #080810;
+      --surface: #0d0d1a;
+      --border: #1f2937;
+      --text:   #e5e7eb;
+      --muted:  #9ca3af;
+      --dim:    #4b5563;
+      --font:   'IBM Plex Mono', monospace;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font);
+      font-size: 14px;
+      line-height: 1.8;
+      min-height: 100vh;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .nav-logo { display: flex; align-items: center; gap: 9px; text-decoration: none; }
+
+    .logo-icon {
+      width: 26px; height: 26px;
+      background: var(--purple);
+      border-radius: 7px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px; color: #fff;
+    }
+
+    .logo-name { color: #fff; font-size: 13px; font-weight: 700; }
+
+    .nav-back {
+      color: var(--dim); font-size: 11px; text-decoration: none;
+      letter-spacing: 0.05em; transition: color .15s;
+    }
+    .nav-back:hover { color: var(--text); }
+
+    /* ── LAYOUT ── */
+    .page { max-width: 760px; margin: 0 auto; padding: 56px 32px 100px; }
+
+    /* ── HEADER ── */
+    .page-header { margin-bottom: 48px; padding-bottom: 32px; border-bottom: 1px solid var(--border); }
+
+    .page-eyebrow {
+      font-size: 10px; font-weight: 700; letter-spacing: 0.14em;
+      text-transform: uppercase; color: var(--purple); margin-bottom: 14px;
+    }
+
+    .page-title { font-size: 28px; font-weight: 700; color: #fff; letter-spacing: -0.01em; margin-bottom: 12px; }
+    .page-meta  { font-size: 12px; color: var(--dim); }
+    .page-meta span { color: var(--muted); }
+
+    /* ── TOC ── */
+    .toc {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 16px; padding: 24px 28px; margin-bottom: 48px;
+    }
+
+    .toc-title {
+      font-size: 10px; font-weight: 700; letter-spacing: 0.14em;
+      text-transform: uppercase; color: var(--dim); margin-bottom: 14px;
+    }
+
+    .toc ol { list-style: none; display: grid; grid-template-columns: 1fr 1fr; gap: 6px 24px; }
+    .toc li  { counter-increment: toc; }
+
+    .toc a {
+      color: var(--muted); text-decoration: none; font-size: 12px;
+      transition: color .15s; display: flex; align-items: baseline; gap: 7px;
+    }
+
+    .toc a::before {
+      content: counter(toc, decimal-leading-zero);
+      font-size: 10px; color: var(--dim); flex-shrink: 0;
+    }
+
+    .toc a:hover { color: #fff; }
+
+    /* ── SECTIONS ── */
+    section { margin-bottom: 52px; scroll-margin-top: 72px; }
+
+    .section-num {
+      font-size: 10px; font-weight: 700; letter-spacing: 0.14em;
+      text-transform: uppercase; color: var(--purple); margin-bottom: 6px;
+    }
+
+    h2 { font-size: 18px; font-weight: 700; color: #fff; margin-bottom: 18px; letter-spacing: -0.01em; }
+    h3 { font-size: 13px; font-weight: 700; color: var(--text); margin: 22px 0 8px; }
+
+    p { color: var(--muted); margin-bottom: 14px; font-size: 13px; }
+    p:last-child { margin-bottom: 0; }
+
+    a { color: var(--purple); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    /* ── PLAN CARDS ── */
+    .plan-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 16px 0; }
+
+    .plan-card {
+      border-radius: 14px; padding: 20px;
+      border: 1px solid var(--border); background: var(--surface);
+    }
+
+    .plan-card.featured { border-color: var(--purple); background: #6C63FF0d; }
+
+    .plan-name  { font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--dim); margin-bottom: 6px; }
+    .plan-price { font-size: 26px; font-weight: 700; color: #fff; line-height: 1; margin-bottom: 4px; }
+    .plan-cycle { font-size: 11px; color: var(--dim); margin-bottom: 14px; }
+    .plan-items { list-style: none; display: flex; flex-direction: column; gap: 5px; }
+
+    .plan-items li {
+      font-size: 11px; color: var(--muted);
+      display: flex; align-items: flex-start; gap: 7px; line-height: 1.5;
+    }
+
+    .plan-items li::before { content: '→'; color: var(--purple); flex-shrink: 0; }
+
+    /* ── BULLET LIST ── */
+    .bullet-list {
+      list-style: none; display: flex; flex-direction: column;
+      gap: 6px; margin: 12px 0;
+    }
+
+    .bullet-list li {
+      font-size: 13px; color: var(--muted);
+      display: flex; align-items: flex-start; gap: 10px; line-height: 1.6;
+    }
+
+    .bullet-list li .icon { color: var(--purple); flex-shrink: 0; }
+    .bullet-list li .icon.red { color: var(--coral); }
+
+    /* ── DATA TABLE ── */
+    .data-table { width: 100%; border-collapse: collapse; margin: 16px 0 20px; font-size: 12px; }
+
+    .data-table th {
+      text-align: left; font-size: 9px; font-weight: 700;
+      letter-spacing: 0.12em; text-transform: uppercase; color: var(--dim);
+      padding: 8px 12px; border-bottom: 1px solid var(--border);
+    }
+
+    .data-table td {
+      padding: 10px 12px; color: var(--muted);
+      border-bottom: 1px solid #111827; vertical-align: top;
+    }
+
+    .data-table tr:last-child td { border-bottom: none; }
+    .data-table td:first-child   { color: var(--text); font-weight: 600; width: 28%; }
+
+    /* ── CALLOUT ── */
+    .callout {
+      background: #6C63FF0d; border: 1px solid #6C63FF30;
+      border-radius: 12px; padding: 16px 18px; margin: 16px 0;
+    }
+
+    .callout p { font-size: 12px; color: var(--muted); margin: 0; }
+    .callout strong { color: var(--text); }
+
+    .callout.warn  { background: #FF65840d; border-color: #FF658430; }
+    .callout.alert { background: #f59e0b0d; border-color: #f59e0b30; }
+
+    /* ── FOOTER ── */
+    footer { border-top: 1px solid var(--border); padding: 28px 32px; text-align: center; }
+
+    .footer-logo { display: inline-flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+
+    .footer-logo-icon {
+      width: 20px; height: 20px; background: var(--purple);
+      border-radius: 5px; display: flex; align-items: center;
+      justify-content: center; font-size: 10px; color: #fff;
+    }
+
+    .footer-logo-name { color: #fff; font-size: 12px; font-weight: 700; }
+    .footer-copy { color: var(--dim); font-size: 11px; }
+    .footer-links { display: flex; justify-content: center; gap: 20px; margin-top: 8px; }
+    .footer-links a { color: var(--dim); font-size: 11px; text-decoration: none; }
+    .footer-links a:hover { color: var(--muted); }
+
+    @media (max-width: 600px) {
+      .page { padding: 40px 20px 80px; }
+      nav   { padding: 14px 20px; }
+      .toc ol    { grid-template-columns: 1fr; }
+      .plan-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <a href="/" class="nav-logo">
+      <div class="logo-icon">✦</div>
+      <span class="logo-name">Humble-UI</span>
+    </a>
+    <a href="/" class="nav-back">← Back to app</a>
+  </nav>
+
+  <div class="page">
+
+    <div class="page-header">
+      <p class="page-eyebrow">Legal</p>
+      <h1 class="page-title">Terms &amp; Conditions</h1>
+      <p class="page-meta">
+        Effective date: <span>9 April 2025</span> &nbsp;·&nbsp; Last updated: <span>9 April 2025</span>
+      </p>
+    </div>
+
+    <div class="callout alert">
+      <p>
+        <strong>Please read these Terms carefully before using Humble-UI.</strong> By accessing or using the Service, you confirm that you have read, understood, and agree to be bound by these Terms. If you do not agree, you must not use the Service.
+      </p>
+    </div>
+
+    <br/>
+
+    <div class="toc">
+      <p class="toc-title">Contents</p>
+      <ol style="counter-reset: toc;">
+        <li><a href="#s1">Definitions</a></li>
+        <li><a href="#s2">Eligibility</a></li>
+        <li><a href="#s3">Account registration</a></li>
+        <li><a href="#s4">Description of the Service</a></li>
+        <li><a href="#s5">Subscription plans &amp; billing</a></li>
+        <li><a href="#s6">Free demo</a></li>
+        <li><a href="#s7">Acceptable use</a></li>
+        <li><a href="#s8">Prohibited conduct</a></li>
+        <li><a href="#s9">Intellectual property</a></li>
+        <li><a href="#s10">User-generated content</a></li>
+        <li><a href="#s11">Third-party services</a></li>
+        <li><a href="#s12">Disclaimers</a></li>
+        <li><a href="#s13">Limitation of liability</a></li>
+        <li><a href="#s14">Indemnification</a></li>
+        <li><a href="#s15">Termination</a></li>
+        <li><a href="#s16">Governing law &amp; disputes</a></li>
+        <li><a href="#s17">Changes to these Terms</a></li>
+        <li><a href="#s18">Contact</a></li>
+      </ol>
+    </div>
+
+    <!-- 1 -->
+    <section id="s1">
+      <p class="section-num">01</p>
+      <h2>Definitions</h2>
+      <table class="data-table">
+        <thead><tr><th>Term</th><th>Meaning</th></tr></thead>
+        <tbody>
+          <tr><td>"Humble-UI" / "we" / "us"</td><td>The operator of the website humble-ui.com and associated services.</td></tr>
+          <tr><td>"Service"</td><td>The Humble-UI web application and all features accessible at humble-ui.com and humble-ui.co.uk, including the prompt generator, saved prompts, account management, and any related APIs.</td></tr>
+          <tr><td>"you" / "User"</td><td>Any individual who accesses or uses the Service, whether as a visitor, demo user, or paying subscriber.</td></tr>
+          <tr><td>"Account"</td><td>The account created when you register with your email address.</td></tr>
+          <tr><td>"Content"</td><td>Any text, data, or output generated through or submitted to the Service, including app ideas, prompt inputs, generated prompts, and saved prompts.</td></tr>
+          <tr><td>"Subscription"</td><td>A paid plan (Monthly or Lifetime) that grants access to the full features of the Service.</td></tr>
+          <tr><td>"Terms"</td><td>These Terms &amp; Conditions, as amended from time to time.</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- 2 -->
+    <section id="s2">
+      <p class="section-num">02</p>
+      <h2>Eligibility</h2>
+      <p>
+        You must be at least 13 years of age (or 16 in the EEA and UK where applicable) to use the Service.
+        By using the Service, you represent and warrant that you meet this requirement.
+      </p>
+      <p>
+        If you are using the Service on behalf of an organisation, you represent that you have the authority
+        to bind that organisation to these Terms, and "you" refers to both you and the organisation.
+      </p>
+      <p>
+        The Service is not available to persons who have been previously barred from using it or who reside
+        in jurisdictions where it is prohibited by law.
+      </p>
+    </section>
+
+    <!-- 3 -->
+    <section id="s3">
+      <p class="section-num">03</p>
+      <h2>Account registration</h2>
+      <p>
+        To access saved prompts and paid features, you must create an Account by providing your email address.
+        We use passwordless authentication — a magic link is sent to your email each time you sign in.
+      </p>
+      <ul class="bullet-list">
+        <li><span class="icon">→</span> You must provide a valid email address that you own and control.</li>
+        <li><span class="icon">→</span> You are responsible for maintaining access to that email account and keeping your magic links confidential.</li>
+        <li><span class="icon">→</span> You must not share your Account or allow others to access the Service through your Account.</li>
+        <li><span class="icon">→</span> You must notify us immediately at <a href="mailto:support@humble-ui.co.uk">support@humble-ui.co.uk</a> if you suspect unauthorised access to your Account.</li>
+        <li><span class="icon">→</span> You are responsible for all activity that occurs under your Account.</li>
+      </ul>
+      <p>
+        We reserve the right to disable or delete any Account that violates these Terms or that has been
+        inactive for an extended period, subject to reasonable notice where required by law.
+      </p>
+    </section>
+
+    <!-- 4 -->
+    <section id="s4">
+      <p class="section-num">04</p>
+      <h2>Description of the Service</h2>
+      <p>
+        Humble-UI is a prompt engineering tool. It takes structured inputs from you (app idea, use case,
+        colour palette, complexity level, and optional extra context) and generates detailed, production-grade
+        text prompts designed to be pasted into AI code-generation tools such as Claude, GPT-4, Lovable,
+        or Bolt to produce UI mockups.
+      </p>
+      <p>
+        <strong style="color:var(--text)">Humble-UI does not generate UI mockups directly.</strong> It generates
+        the prompt instructions. The quality and nature of the resulting mockup depends entirely on the
+        third-party AI model you choose to use with the generated prompt.
+      </p>
+      <p>
+        The Service includes the following features depending on your plan:
+      </p>
+      <ul class="bullet-list">
+        <li><span class="icon">→</span> Prompt generation across 6 use cases (mobile app, dashboard, landing page, SaaS product, portfolio, e-commerce).</li>
+        <li><span class="icon">→</span> 8 curated dark-mode colour palettes with exact hex values.</li>
+        <li><span class="icon">→</span> Three complexity levels: Simple, Standard, and Advanced.</li>
+        <li><span class="icon">→</span> Saving and loading up to your plan limit of generated prompts.</li>
+        <li><span class="icon">→</span> One free demo generation (no account required).</li>
+      </ul>
+      <p>
+        We reserve the right to modify, suspend, or discontinue any aspect of the Service at any time with
+        reasonable notice to subscribers.
+      </p>
+    </section>
+
+    <!-- 5 -->
+    <section id="s5">
+      <p class="section-num">05</p>
+      <h2>Subscription plans &amp; billing</h2>
+
+      <h3>Available plans</h3>
+      <div class="plan-grid">
+        <div class="plan-card">
+          <div class="plan-name">Monthly</div>
+          <div class="plan-price">$9.99</div>
+          <div class="plan-cycle">per month, billed monthly</div>
+          <ul class="plan-items">
+            <li>All 6 use cases &amp; 8 palettes</li>
+            <li>Simple, Standard &amp; Advanced complexity</li>
+            <li>Unlimited prompt generations</li>
+            <li>Save &amp; load prompts</li>
+            <li>Cancel anytime</li>
+          </ul>
+        </div>
+        <div class="plan-card featured">
+          <div class="plan-name">Lifetime</div>
+          <div class="plan-price">$49.99</div>
+          <div class="plan-cycle">one-time payment, no renewal</div>
+          <ul class="plan-items">
+            <li>Everything in Monthly</li>
+            <li>All future use cases &amp; palettes</li>
+            <li>Priority feature requests</li>
+            <li>Developer support</li>
+            <li>No recurring charges — ever</li>
+          </ul>
+        </div>
+      </div>
+
+      <h3>Billing &amp; payment</h3>
+      <ul class="bullet-list">
+        <li><span class="icon">→</span> All payments are processed securely by <strong style="color:var(--text)">Stripe</strong>. We do not store or handle payment card details.</li>
+        <li><span class="icon">→</span> Monthly subscriptions are billed on a recurring basis on the same calendar date each month.</li>
+        <li><span class="icon">→</span> Prices are listed in US Dollars (USD). Your bank may apply currency conversion fees.</li>
+        <li><span class="icon">→</span> All prices are inclusive of any applicable taxes unless otherwise stated. We may be required to collect VAT or similar taxes depending on your location.</li>
+      </ul>
+
+      <h3>Cancellation</h3>
+      <p>
+        You may cancel your Monthly subscription at any time through Stripe's customer portal or by contacting
+        us at <a href="mailto:support@humble-ui.co.uk">support@humble-ui.co.uk</a>. Cancellation takes effect
+        at the end of the current billing period. You will retain access to the Service until that date.
+        No refund is issued for the remaining days of the current period unless required by law.
+      </p>
+
+      <h3>Refunds</h3>
+      <p>
+        <strong style="color:var(--text)">Monthly plan:</strong> We offer a 7-day refund on your first
+        monthly charge if you are not satisfied with the Service. Subsequent monthly charges are non-refundable
+        except where required by applicable consumer law.
+      </p>
+      <p>
+        <strong style="color:var(--text)">Lifetime plan:</strong> We offer a 14-day refund on the Lifetime
+        plan if you are not satisfied with the Service. Refund requests must be made within 14 days of
+        purchase by emailing <a href="mailto:support@humble-ui.co.uk">support@humble-ui.co.uk</a>.
+      </p>
+      <p>
+        Refunds are at our discretion where the relevant period has passed. Nothing in these Terms limits
+        your statutory rights under applicable consumer protection law.
+      </p>
+
+      <h3>Failed payments &amp; plan downgrade</h3>
+      <p>
+        If a recurring payment fails, Stripe will retry the charge over several days. If payment cannot be
+        collected, your account will be downgraded to the free tier and you will lose access to paid features.
+        We will notify you by email before downgrading your account.
+      </p>
+
+      <h3>Price changes</h3>
+      <p>
+        We reserve the right to change subscription prices. For Monthly subscribers, we will provide at
+        least 30 days' written notice before a price increase takes effect. Your continued use of the Service
+        after the effective date constitutes acceptance of the new price.
+        Lifetime plan holders are not subject to price changes after their one-time purchase.
+      </p>
+    </section>
+
+    <!-- 6 -->
+    <section id="s6">
+      <p class="section-num">06</p>
+      <h2>Free demo</h2>
+      <p>
+        Without an account or subscription, you may use the Service to generate one (1) prompt for free
+        (the "<strong>Free Demo</strong>"). The Free Demo:
+      </p>
+      <ul class="bullet-list">
+        <li><span class="icon">→</span> Is limited to one generation per browser (tracked via local storage).</li>
+        <li><span class="icon">→</span> Does not require an account or payment details.</li>
+        <li><span class="icon">→</span> Does not allow saving or loading prompts.</li>
+        <li><span class="icon">→</span> Is provided "as is" with no guarantees of continued availability.</li>
+      </ul>
+      <p>
+        We reserve the right to modify or withdraw the Free Demo at any time without notice.
+      </p>
+    </section>
+
+    <!-- 7 -->
+    <section id="s7">
+      <p class="section-num">07</p>
+      <h2>Acceptable use</h2>
+      <p>
+        You may use the Service only for lawful purposes and in accordance with these Terms. You agree to
+        use the Service to generate prompts for legitimate UI design and development purposes.
+      </p>
+      <p>
+        You are solely responsible for the app ideas and content you submit to the Service and for what
+        you do with the prompts the Service generates. The generated prompts are text instructions — their
+        use is governed by the terms of whatever third-party AI tool you paste them into.
+      </p>
+    </section>
+
+    <!-- 8 -->
+    <section id="s8">
+      <p class="section-num">08</p>
+      <h2>Prohibited conduct</h2>
+      <p>You must not use the Service to:</p>
+      <ul class="bullet-list">
+        <li><span class="icon red">×</span> Generate prompts intended to produce illegal, harmful, abusive, defamatory, obscene, or discriminatory content.</li>
+        <li><span class="icon red">×</span> Attempt to reverse-engineer, decompile, disassemble, or otherwise derive the source code of the Service.</li>
+        <li><span class="icon red">×</span> Scrape, crawl, or systematically extract data from the Service by automated means without our prior written consent.</li>
+        <li><span class="icon red">×</span> Use the Service to build a competing product or service that replicates its core functionality.</li>
+        <li><span class="icon red">×</span> Circumvent, disable, or interfere with security features, rate limits, or access controls of the Service.</li>
+        <li><span class="icon red">×</span> Attempt to access another user's account, data, or any part of the Service you are not authorised to access.</li>
+        <li><span class="icon red">×</span> Upload or transmit viruses, malware, or any code designed to disrupt or damage the Service or its infrastructure.</li>
+        <li><span class="icon red">×</span> Engage in any activity that places an unreasonable or disproportionate load on our infrastructure.</li>
+        <li><span class="icon red">×</span> Use the Service in violation of any applicable law or regulation.</li>
+        <li><span class="icon red">×</span> Misrepresent your identity or affiliation when using the Service.</li>
+      </ul>
+      <p>
+        Violation of these prohibitions may result in immediate suspension or termination of your Account
+        without refund and, where appropriate, referral to law enforcement authorities.
+      </p>
+    </section>
+
+    <!-- 9 -->
+    <section id="s9">
+      <p class="section-num">09</p>
+      <h2>Intellectual property</h2>
+
+      <h3>Our intellectual property</h3>
+      <p>
+        The Service — including its design, code, interface, branding, colour palettes, prompt templates,
+        and all associated content we create — is owned by or licensed to Humble-UI and is protected by
+        copyright, trade mark, and other intellectual property laws.
+      </p>
+      <p>
+        These Terms do not grant you any right, title, or interest in the Service or our intellectual
+        property, other than the limited licence to use the Service as described herein.
+      </p>
+
+      <h3>Licence to use the Service</h3>
+      <p>
+        Subject to your compliance with these Terms and payment of applicable fees, we grant you a limited,
+        non-exclusive, non-transferable, non-sublicensable, revocable licence to access and use the Service
+        for your own personal or commercial UI development purposes.
+      </p>
+
+      <h3>Ownership of generated prompts</h3>
+      <p>
+        The text prompts generated by the Service are produced by combining your inputs with our proprietary
+        prompt templates. You retain ownership of the specific app idea and context you provide. The
+        structural framework, palette definitions, and prompt architecture embedded in each generated
+        prompt remain proprietary to Humble-UI.
+      </p>
+      <p>
+        You may freely use, copy, modify, and share the generated prompts for any purpose, including
+        commercially, provided you do not represent the prompt templates themselves as your own original
+        work or attempt to replicate the Service.
+      </p>
+
+      <h3>Feedback</h3>
+      <p>
+        If you provide us with feedback, suggestions, or ideas about the Service, you grant us a perpetual,
+        irrevocable, royalty-free licence to use that feedback for any purpose without compensation to you.
+      </p>
+    </section>
+
+    <!-- 10 -->
+    <section id="s10">
+      <p class="section-num">10</p>
+      <h2>User-generated content</h2>
+      <p>
+        You are solely responsible for the app ideas, descriptions, and other inputs you submit to the
+        Service ("<strong>User Content</strong>"). By submitting User Content, you represent and warrant that:
+      </p>
+      <ul class="bullet-list">
+        <li><span class="icon">→</span> You own or have the right to submit the User Content.</li>
+        <li><span class="icon">→</span> The User Content does not infringe any third-party intellectual property rights.</li>
+        <li><span class="icon">→</span> The User Content does not contain personally identifiable information of third parties without their consent.</li>
+        <li><span class="icon">→</span> The User Content complies with these Terms and all applicable laws.</li>
+      </ul>
+      <p>
+        By submitting User Content, you grant us a limited licence to process and store it solely for the
+        purpose of operating the Service (e.g. generating your prompt, saving it to your account). We do
+        not use your User Content to train AI models, share it with third parties for commercial purposes,
+        or use it beyond what is necessary to provide the Service.
+      </p>
+      <p>
+        We do not actively monitor User Content but reserve the right to remove any content that violates
+        these Terms or applicable law.
+      </p>
+    </section>
+
+    <!-- 11 -->
+    <section id="s11">
+      <p class="section-num">11</p>
+      <h2>Third-party services</h2>
+      <p>
+        The Service relies on third-party providers including Supabase (database &amp; authentication),
+        Stripe (payments), Resend (email), PostHog (analytics), Sentry (error monitoring), and Vercel
+        (hosting). Your use of the Service is also subject to the terms and policies of these providers
+        where relevant.
+      </p>
+      <p>
+        The Service may contain links to third-party websites or tools (such as Claude, GPT-4, Lovable, or
+        Bolt) where you can use the generated prompts. We are not responsible for the content, terms, or
+        practices of those third-party services. Your use of them is governed by their own terms and
+        privacy policies.
+      </p>
+      <div class="callout">
+        <p>
+          <strong>AI model outputs are beyond our control.</strong> The quality, accuracy, or suitability
+          of the UI mockup produced when you paste a Humble-UI prompt into a third-party AI tool is
+          determined entirely by that tool. We make no guarantees about third-party AI output.
+        </p>
+      </div>
+    </section>
+
+    <!-- 12 -->
+    <section id="s12">
+      <p class="section-num">12</p>
+      <h2>Disclaimers</h2>
+      <p>
+        The Service is provided on an "<strong>as is</strong>" and "<strong>as available</strong>" basis,
+        without warranties of any kind, express or implied, to the fullest extent permitted by applicable law.
+      </p>
+      <ul class="bullet-list">
+        <li><span class="icon red">×</span> We do not warrant that the Service will be uninterrupted, error-free, or free from viruses or other harmful components.</li>
+        <li><span class="icon red">×</span> We do not warrant that the generated prompts will produce any particular result when used with a third-party AI model.</li>
+        <li><span class="icon red">×</span> We do not warrant that the Service will meet your specific requirements or expectations.</li>
+        <li><span class="icon red">×</span> We disclaim all implied warranties of merchantability, fitness for a particular purpose, and non-infringement.</li>
+      </ul>
+      <p>
+        Nothing in these Terms excludes or limits warranties or rights that cannot be excluded or limited
+        under applicable consumer protection law, including the UK Consumer Rights Act 2015.
+      </p>
+    </section>
+
+    <!-- 13 -->
+    <section id="s13">
+      <p class="section-num">13</p>
+      <h2>Limitation of liability</h2>
+      <p>
+        To the fullest extent permitted by applicable law, Humble-UI and its operators shall not be liable
+        for any indirect, incidental, special, consequential, or punitive damages arising out of or in
+        connection with your use of the Service, including but not limited to:
+      </p>
+      <ul class="bullet-list">
+        <li><span class="icon red">×</span> Loss of profits, revenue, or business.</li>
+        <li><span class="icon red">×</span> Loss of data or Content.</li>
+        <li><span class="icon red">×</span> Costs of substitute services.</li>
+        <li><span class="icon red">×</span> Any damages arising from reliance on AI-generated output produced using our prompts.</li>
+      </ul>
+      <p>
+        In no event shall our total cumulative liability to you for all claims arising out of or relating to
+        these Terms or the Service exceed the greater of:
+      </p>
+      <ul class="bullet-list">
+        <li><span class="icon">→</span> The total amount you paid us in the 12 months preceding the claim; or</li>
+        <li><span class="icon">→</span> £50 GBP (fifty pounds sterling).</li>
+      </ul>
+      <div class="callout warn">
+        <p>
+          <strong>Some jurisdictions do not allow the exclusion of certain warranties or limitation of liability for consequential or incidental damages.</strong> In those jurisdictions, our liability is limited to the greatest extent permitted by law. Nothing in these Terms limits your statutory rights under applicable consumer law.
+        </p>
+      </div>
+    </section>
+
+    <!-- 14 -->
+    <section id="s14">
+      <p class="section-num">14</p>
+      <h2>Indemnification</h2>
+      <p>
+        You agree to defend, indemnify, and hold harmless Humble-UI and its operators from and against any
+        claims, damages, losses, liabilities, costs, and expenses (including reasonable legal fees) arising
+        out of or relating to:
+      </p>
+      <ul class="bullet-list">
+        <li><span class="icon">→</span> Your use of the Service in violation of these Terms.</li>
+        <li><span class="icon">→</span> User Content you submit that infringes the rights of a third party.</li>
+        <li><span class="icon">→</span> Any misrepresentation you make in connection with the Service.</li>
+        <li><span class="icon">→</span> Your violation of any applicable law or regulation.</li>
+      </ul>
+    </section>
+
+    <!-- 15 -->
+    <section id="s15">
+      <p class="section-num">15</p>
+      <h2>Termination</h2>
+
+      <h3>Termination by you</h3>
+      <p>
+        You may close your Account at any time by emailing
+        <a href="mailto:support@humble-ui.co.uk">support@humble-ui.co.uk</a>. If you have an active
+        Monthly subscription, you should cancel it first through Stripe to avoid further charges. Closing
+        your Account does not automatically cancel an active subscription.
+      </p>
+
+      <h3>Termination by us</h3>
+      <p>
+        We may suspend or terminate your Account and access to the Service immediately, with or without
+        notice, if we reasonably determine that you have violated these Terms, engaged in fraudulent
+        activity, or your continued use poses a risk to the Service or other users.
+      </p>
+      <p>
+        We may also terminate the Service entirely upon 30 days' written notice to all active subscribers.
+        In the event of such termination, we will pro-rata refund any unused portion of a prepaid Monthly
+        subscription. Lifetime plan holders will receive a full refund or a pro-rated refund at our
+        discretion.
+      </p>
+
+      <h3>Effect of termination</h3>
+      <p>
+        Upon termination, your licence to use the Service ceases immediately. We will delete your Account
+        data in accordance with our <a href="/privacy.html">Privacy Policy</a>. Provisions of these Terms
+        that by their nature should survive (including Sections 9, 12, 13, 14, and 16) will continue to
+        apply.
+      </p>
+    </section>
+
+    <!-- 16 -->
+    <section id="s16">
+      <p class="section-num">16</p>
+      <h2>Governing law &amp; disputes</h2>
+      <p>
+        These Terms are governed by and construed in accordance with the laws of England and Wales,
+        without regard to conflict of law provisions.
+      </p>
+      <p>
+        Any dispute arising out of or in connection with these Terms or the Service shall first be referred
+        to us by emailing <a href="mailto:support@humble-ui.co.uk">support@humble-ui.co.uk</a> so we can
+        attempt to resolve it informally within 30 days.
+      </p>
+      <p>
+        If a dispute cannot be resolved informally, it shall be subject to the exclusive jurisdiction of
+        the courts of England and Wales, except where applicable consumer law in your country of residence
+        grants you the right to bring proceedings in local courts.
+      </p>
+      <p>
+        If you are a consumer in the European Union, you may also use the
+        <a href="https://ec.europa.eu/consumers/odr/" target="_blank" rel="noopener">EU Online Dispute Resolution platform</a>
+        to resolve disputes.
+      </p>
+    </section>
+
+    <!-- 17 -->
+    <section id="s17">
+      <p class="section-num">17</p>
+      <h2>Changes to these Terms</h2>
+      <p>
+        We may update these Terms from time to time. When we make material changes, we will update the
+        "Last updated" date at the top of this page. For active subscribers, we will provide at least
+        14 days' notice by email before material changes take effect.
+      </p>
+      <p>
+        Your continued use of the Service after the effective date of revised Terms constitutes your
+        acceptance of those changes. If you do not agree with the revised Terms, you must stop using the
+        Service and, if applicable, cancel your subscription before the changes take effect.
+      </p>
+    </section>
+
+    <!-- 18 -->
+    <section id="s18">
+      <p class="section-num">18</p>
+      <h2>Contact</h2>
+      <p>
+        If you have any questions about these Terms, please contact us:
+      </p>
+      <div class="callout">
+        <p>
+          <strong>Email:</strong> <a href="mailto:support@humble-ui.co.uk">support@humble-ui.co.uk</a><br/>
+          <strong>Website:</strong> <a href="https://humble-ui.com">humble-ui.com</a><br/>
+          <strong>Response time:</strong> We aim to respond to all enquiries within 5 business days.
+        </p>
+      </div>
+    </section>
+
+  </div>
+
+  <footer>
+    <div class="footer-logo">
+      <div class="footer-logo-icon">✦</div>
+      <span class="footer-logo-name">Humble-UI</span>
+    </div>
+    <p class="footer-copy">© 2025 Humble-UI. All rights reserved.</p>
+    <div class="footer-links">
+      <a href="/privacy.html">Privacy Policy</a>
+      <a href="/terms.html">Terms &amp; Conditions</a>
+    </div>
+  </footer>
+
+</body>
+</html>
