@@ -31,3 +31,4 @@ mobiledev-web/src/components/mobile-prompt-generator.jsx
 .vercel
 .env*.local
 ads-preview.html
+/openspec/
