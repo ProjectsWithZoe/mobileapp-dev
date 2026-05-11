@@ -1,16 +1,25 @@
 import { useState, useCallback } from 'react'
 
+const ORANGE  = "#EA580C"
+const AMBER   = "#FB923C"
+const BROWN   = "#1C0A02"
+const BROWN2  = "#5C2E0A"
+const BROWN3  = "#9A6040"
+const BG      = "#FFFBF7"
+const SURF    = "#FFFFFF"
+const BORDER  = "#E8CFBA"
+
 const COPY = {
   signup: {
     eyebrow: 'Get started',
     heading: 'Create your account',
-    sub: 'Enter your email — we\'ll send a magic link to get you in.',
+    sub: "Enter your email — we'll send a magic link to get you in.",
     button: 'Create Account →',
   },
   signin: {
     eyebrow: 'Sign in',
     heading: 'Welcome back',
-    sub: 'Enter your email — we\'ll send a one-click sign-in link.',
+    sub: "Enter your email — we'll send a one-click sign-in link.",
     button: 'Send Magic Link →',
   },
 }
@@ -39,21 +48,25 @@ export default function AuthModal({ onClose, onSignIn, mode = 'signin', onOtpSen
   }, [email, onSignIn, onOtpSent])
 
   return (
-    /* Backdrop */
     <div
       className="fixed inset-0 z-50 flex items-center justify-center p-4"
-      style={{ backgroundColor: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(4px)' }}
+      style={{ backgroundColor: 'rgba(28,10,2,0.55)', backdropFilter: 'blur(6px)' }}
       onClick={(e) => { if (e.target === e.currentTarget) onClose() }}
     >
-      {/* Panel */}
       <div
-        className="relative w-full max-w-sm rounded-2xl border border-gray-800 p-6"
-        style={{ backgroundColor: '#0d1117', fontFamily: "'IBM Plex Mono', monospace" }}
+        className="relative w-full max-w-sm rounded-2xl p-7"
+        style={{
+          backgroundColor: SURF,
+          border: `1px solid ${BORDER}`,
+          boxShadow: '0 24px 60px rgba(92,46,10,0.18)',
+          fontFamily: "'Inter', system-ui, sans-serif",
+        }}
       >
         {/* Close */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 text-gray-500 hover:text-gray-300 transition-colors text-lg leading-none"
+          className="absolute top-4 right-4 transition-colors"
+          style={{ background: 'none', border: 'none', cursor: 'pointer', color: BROWN3, fontSize: '18px', lineHeight: 1 }}
           aria-label="Close"
         >
           ✕
@@ -63,28 +76,29 @@ export default function AuthModal({ onClose, onSignIn, mode = 'signin', onOtpSen
           /* ── Success state ── */
           <div className="flex flex-col items-center text-center py-4 gap-4">
             <div
-              className="w-12 h-12 rounded-full flex items-center justify-center text-xl"
-              style={{ backgroundColor: '#6C63FF20', color: '#6C63FF' }}
+              className="w-12 h-12 rounded-full flex items-center justify-center text-xl font-semibold"
+              style={{ backgroundColor: `${ORANGE}15`, color: ORANGE }}
             >
               ✓
             </div>
             <div>
-              <p className="text-white font-bold text-sm">Check your inbox</p>
+              <p className="font-semibold text-sm" style={{ color: BROWN }}>Check your inbox</p>
               {hasPendingPlan ? (
-                <p className="text-gray-500 text-xs mt-1">
+                <p className="text-xs mt-1 leading-relaxed" style={{ color: BROWN3 }}>
                   The payment page is opening now.{' '}
-                  <span className="text-gray-300">Also check {email}</span> — you must click the magic link we just sent to activate your Humble UI account after paying.
+                  <span style={{ color: BROWN2 }}>Also check {email}</span> — click the magic link to activate your account after paying.
                 </p>
               ) : (
-                <p className="text-gray-500 text-xs mt-1">
-                  We sent a magic link to <span className="text-gray-300">{email}</span>.
+                <p className="text-xs mt-1 leading-relaxed" style={{ color: BROWN3 }}>
+                  We sent a magic link to <span style={{ color: BROWN2 }}>{email}</span>.
                   Click it to sign in — no password needed.
                 </p>
               )}
             </div>
             <button
               onClick={onClose}
-              className="text-xs text-gray-600 hover:text-gray-400 transition-colors"
+              className="text-xs transition-colors hover:underline"
+              style={{ background: 'none', border: 'none', cursor: 'pointer', color: BROWN3 }}
             >
               Close
             </button>
@@ -92,13 +106,17 @@ export default function AuthModal({ onClose, onSignIn, mode = 'signin', onOtpSen
         ) : (
           /* ── Sign-in form ── */
           <>
-            <div className="mb-5">
-              <div className="flex items-center gap-2 mb-1">
-                <div className="w-2 h-2 rounded-full animate-pulse" style={{ backgroundColor: '#6C63FF' }} />
-                <span className="text-xs uppercase tracking-widest text-gray-500 font-semibold">{copy.eyebrow}</span>
+            <div className="mb-6">
+              <div className="flex items-center gap-2 mb-2">
+                <div className="w-2 h-2 rounded-full animate-pulse" style={{ backgroundColor: ORANGE }} />
+                <span className="text-xs uppercase tracking-widest font-semibold" style={{ color: ORANGE }}>
+                  {copy.eyebrow}
+                </span>
               </div>
-              <h2 className="text-white font-bold text-lg leading-tight">{copy.heading}</h2>
-              <p className="text-gray-500 text-xs mt-1">{copy.sub}</p>
+              <h2 className="text-lg leading-tight mb-1" style={{ color: BROWN, fontFamily: "'Instrument Sans', sans-serif", fontWeight: 500 }}>
+                {copy.heading}
+              </h2>
+              <p className="text-xs leading-relaxed" style={{ color: BROWN3 }}>{copy.sub}</p>
             </div>
 
             <form onSubmit={handleSubmit} className="flex flex-col gap-3">
@@ -109,16 +127,23 @@ export default function AuthModal({ onClose, onSignIn, mode = 'signin', onOtpSen
                 placeholder="you@example.com"
                 required
                 autoFocus
-                className="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-3 text-white placeholder-gray-600 focus:outline-none focus:border-gray-500 text-sm"
+                className="w-full rounded-xl px-4 py-3 text-sm focus:outline-none transition-colors"
+                style={{
+                  backgroundColor: BG,
+                  border: `1px solid ${BORDER}`,
+                  color: BROWN,
+                  colorScheme: 'light',
+                  fontFamily: "'Inter', system-ui, sans-serif",
+                }}
               />
               {error && (
-                <p className="text-xs text-red-400">{error}</p>
+                <p className="text-xs" style={{ color: '#DC2626' }}>{error}</p>
               )}
               <button
                 type="submit"
                 disabled={loading || !email.trim()}
-                className="w-full py-3 rounded-xl font-bold text-sm transition-all duration-200 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed"
-                style={{ backgroundColor: '#6C63FF', color: 'white' }}
+                className="w-full py-3 rounded-xl font-semibold text-sm text-white transition-all duration-150 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed"
+                style={{ background: `linear-gradient(135deg, ${ORANGE}, ${AMBER})` }}
               >
                 {loading ? 'Sending…' : copy.button}
               </button>
