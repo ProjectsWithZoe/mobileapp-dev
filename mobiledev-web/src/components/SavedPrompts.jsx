@@ -1,5 +1,14 @@
 import { useState, useCallback } from 'react'
 
+const ORANGE = "#EA580C"
+const BROWN  = "#1C0A02"
+const BROWN2 = "#5C2E0A"
+const BROWN3 = "#9A6040"
+const BG     = "#FFFBF7"
+const SURF   = "#FFFFFF"
+const SURF2  = "#FFF5EC"
+const BORDER = "#E8CFBA"
+
 // Must match the COLOR_PALETTES order in ComplexGenerator
 const COLOR_PALETTES = [
   { name: "Midnight", colors: ["#0F0F23", "#6C63FF", "#FF6584"] },
@@ -22,7 +31,7 @@ const USE_CASE_ICONS = {
 }
 
 function relativeTime(iso) {
-  const diff = Date.now() - new Date(iso).getTime()
+  const diff  = Date.now() - new Date(iso).getTime()
   const mins  = Math.floor(diff / 60_000)
   const hours = Math.floor(diff / 3_600_000)
   const days  = Math.floor(diff / 86_400_000)
@@ -34,13 +43,13 @@ function relativeTime(iso) {
 
 function SkeletonCard() {
   return (
-    <div className="rounded-xl border border-gray-800 bg-gray-900 p-4 animate-pulse">
-      <div className="h-3 bg-gray-800 rounded w-2/3 mb-3" />
-      <div className="h-2 bg-gray-800 rounded w-1/2 mb-2" />
-      <div className="h-2 bg-gray-800 rounded w-4/5 mb-4" />
+    <div className="rounded-xl p-4 animate-pulse" style={{ border: `1px solid ${BORDER}`, backgroundColor: SURF }}>
+      <div className="h-3 rounded w-2/3 mb-3" style={{ backgroundColor: BORDER }} />
+      <div className="h-2 rounded w-1/2 mb-2" style={{ backgroundColor: BORDER }} />
+      <div className="h-2 rounded w-4/5 mb-4" style={{ backgroundColor: BORDER }} />
       <div className="flex gap-2">
-        <div className="h-7 bg-gray-800 rounded-lg flex-1" />
-        <div className="h-7 bg-gray-800 rounded-lg w-10" />
+        <div className="h-7 rounded-lg flex-1" style={{ backgroundColor: BORDER }} />
+        <div className="h-7 rounded-lg w-10" style={{ backgroundColor: BORDER }} />
       </div>
     </div>
   )
@@ -61,59 +70,59 @@ function PromptCard({ saved, onLoad, onDelete }) {
 
   return (
     <div
-      className="rounded-xl border border-gray-800 bg-gray-900 p-4 flex flex-col gap-3 transition-all duration-150 hover:border-gray-700"
-      style={{ fontFamily: "'IBM Plex Mono', monospace" }}
+      className="rounded-xl p-4 flex flex-col gap-3 transition-all duration-150"
+      style={{ border: `1px solid ${BORDER}`, backgroundColor: SURF, fontFamily: "'Inter', system-ui, sans-serif" }}
     >
       {/* Header row */}
       <div className="flex items-start justify-between gap-2">
-        <p className="text-white text-xs font-bold leading-snug line-clamp-2 flex-1">{saved.name}</p>
-        <span className="text-gray-600 text-xs shrink-0">{relativeTime(saved.created_at)}</span>
+        <p className="text-xs font-semibold leading-snug line-clamp-2 flex-1" style={{ color: BROWN }}>{saved.name}</p>
+        <span className="text-xs shrink-0" style={{ color: BROWN3 }}>{relativeTime(saved.created_at)}</span>
       </div>
 
       {/* Meta row */}
       <div className="flex items-center gap-2 flex-wrap">
-        {/* Palette dots */}
         <div className="flex">
           {palette.colors.map((c, i) => (
             <div
               key={c}
-              className="w-3 h-3 rounded-full border-2 border-gray-900"
-              style={{ backgroundColor: c, marginLeft: i > 0 ? '-3px' : 0 }}
+              className="w-3 h-3 rounded-full border-2"
+              style={{ backgroundColor: c, borderColor: SURF, marginLeft: i > 0 ? '-3px' : 0 }}
             />
           ))}
         </div>
-        <span className="text-gray-600 text-xs">{palette.name}</span>
-        <span className="text-gray-800">·</span>
-        <span className="text-gray-500 text-xs">
+        <span className="text-xs" style={{ color: BROWN3 }}>{palette.name}</span>
+        <span style={{ color: BORDER }}>·</span>
+        <span className="text-xs" style={{ color: BROWN3 }}>
           {USE_CASE_ICONS[saved.use_case] ?? ''} {saved.use_case}
         </span>
-        <span className="text-gray-800">·</span>
+        <span style={{ color: BORDER }}>·</span>
         <span
           className="text-xs px-1.5 py-0.5 rounded-md font-semibold"
-          style={{ backgroundColor: '#6C63FF20', color: '#6C63FF' }}
+          style={{ backgroundColor: `${ORANGE}15`, color: ORANGE }}
         >
           {saved.complexity}
         </span>
       </div>
 
       {/* App idea snippet */}
-      <p className="text-gray-500 text-xs leading-relaxed line-clamp-2">{saved.app_idea}</p>
+      <p className="text-xs leading-relaxed line-clamp-2" style={{ color: BROWN3 }}>{saved.app_idea}</p>
 
       {/* Actions */}
       <div className="flex items-center gap-2 mt-auto">
         <button
           onClick={() => onLoad(saved)}
-          className="flex-1 py-1.5 rounded-lg text-xs font-bold transition-all duration-150 active:scale-95"
-          style={{ backgroundColor: '#6C63FF20', color: '#6C63FF' }}
+          className="flex-1 py-1.5 rounded-lg text-xs font-semibold transition-all duration-150 active:scale-95"
+          style={{ backgroundColor: `${ORANGE}15`, color: ORANGE, border: 'none' }}
         >
           Load ↩
         </button>
         <button
           onClick={handleDelete}
-          className="px-3 py-1.5 rounded-lg text-xs font-bold transition-all duration-150 active:scale-95"
+          className="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-150 active:scale-95"
           style={{
-            backgroundColor: confirmDelete ? '#ef444420' : '#1f2937',
-            color: confirmDelete ? '#ef4444' : '#6b7280',
+            backgroundColor: confirmDelete ? '#ef444420' : SURF2,
+            color: confirmDelete ? '#ef4444' : BROWN3,
+            border: 'none',
           }}
           title={confirmDelete ? 'Click again to confirm' : 'Delete'}
         >
@@ -141,12 +150,12 @@ export default function SavedPrompts({ prompts, loading, onLoad, onDelete }) {
       <SectionHeader count={prompts.length} />
       {prompts.length === 0 ? (
         <div
-          className="border border-dashed border-gray-800 rounded-2xl flex flex-col items-center justify-center py-12 text-center mt-4"
-          style={{ fontFamily: "'IBM Plex Mono', monospace" }}
+          className="rounded-2xl flex flex-col items-center justify-center py-12 text-center mt-4"
+          style={{ border: `1px dashed ${BORDER}`, fontFamily: "'Inter', system-ui, sans-serif" }}
         >
           <span className="text-4xl mb-3">💾</span>
-          <p className="text-gray-500 text-sm font-bold">No saved prompts yet</p>
-          <p className="text-gray-700 text-xs mt-1">Generate a prompt above and click Save to store it here</p>
+          <p className="text-sm font-semibold" style={{ color: BROWN3 }}>No saved prompts yet</p>
+          <p className="text-xs mt-1" style={{ color: BROWN3 }}>Generate a prompt above and click Save to store it here</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
@@ -162,14 +171,14 @@ export default function SavedPrompts({ prompts, loading, onLoad, onDelete }) {
 function SectionHeader({ count, loading }) {
   return (
     <div
-      className="flex items-center gap-3 border-b border-gray-800 pb-3"
-      style={{ fontFamily: "'IBM Plex Mono', monospace" }}
+      className="flex items-center gap-3 pb-3"
+      style={{ borderBottom: `1px solid ${BORDER}`, fontFamily: "'Inter', system-ui, sans-serif" }}
     >
-      <span className="text-xs uppercase tracking-widest font-semibold text-gray-500">Saved Prompts</span>
+      <span className="text-xs uppercase tracking-widest font-semibold" style={{ color: BROWN3 }}>Saved Prompts</span>
       {!loading && (
         <span
-          className="text-xs px-1.5 py-0.5 rounded-md font-bold"
-          style={{ backgroundColor: '#1f2937', color: '#6b7280' }}
+          className="text-xs px-1.5 py-0.5 rounded-md font-semibold"
+          style={{ backgroundColor: SURF2, color: BROWN3 }}
         >
           {count}
         </span>

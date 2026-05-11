@@ -1,16 +1,23 @@
 import { useEffect, useRef, useState } from 'react'
 import { supabase } from '../lib/supabase'
 
-const MAX_POLLS = 5
+const ORANGE = "#EA580C"
+const AMBER  = "#FB923C"
+const BROWN  = "#1C0A02"
+const BROWN3 = "#9A6040"
+const BG     = "#FFFBF7"
+const BORDER = "#E8CFBA"
+
+const MAX_POLLS      = 5
 const POLL_INTERVAL_MS = 1500
 
 export default function PaymentSuccess() {
-  const [plan, setPlan] = useState(null)       // 'monthly' | 'lifetime' | 'free' | null
-  const [loading, setLoading] = useState(true)
+  const [plan, setPlan]         = useState(null)
+  const [loading, setLoading]   = useState(true)
   const [exhausted, setExhausted] = useState(false)
   const [noSession, setNoSession] = useState(false)
   const pollCount = useRef(0)
-  const timer = useRef(null)
+  const timer     = useRef(null)
 
   useEffect(() => {
     if (!supabase) {
@@ -44,7 +51,6 @@ export default function PaymentSuccess() {
         return
       }
 
-      // Plan still 'free' — webhook hasn't fired yet, start polling
       pollCount.current += 1
       if (pollCount.current >= MAX_POLLS) {
         setPlan('free')
@@ -63,40 +69,38 @@ export default function PaymentSuccess() {
     }
   }, [])
 
-  // ── No session ────────────────────────────────────────────────────────────
   if (noSession) {
     return (
       <Screen>
         <Icon>✉️</Icon>
         <Kicker>Payment received</Kicker>
-        <h1 className="text-xl font-semibold text-white mb-2">Check your email</h1>
-        <p className="text-gray-400 text-sm mb-6">We sent an activation link to the email you used at checkout. Click it to create your account and start building.</p>
+        <h1 className="text-xl mb-2" style={{ color: BROWN, fontFamily: "'Instrument Sans', sans-serif", fontWeight: 500 }}>Check your email</h1>
+        <p className="text-sm mb-6" style={{ color: BROWN3 }}>We sent an activation link to the email you used at checkout. Click it to create your account and start building.</p>
       </Screen>
     )
   }
 
-  // ── Loading / polling ─────────────────────────────────────────────────────
   if (loading) {
     return (
       <Screen>
-        <div className="w-8 h-8 border-2 border-gray-600 border-t-emerald-400 rounded-full animate-spin mb-6" />
-        <p className="text-gray-400 text-sm">Confirming your payment…</p>
+        <div className="w-8 h-8 border-2 rounded-full animate-spin mb-6" style={{ borderColor: BORDER, borderTopColor: ORANGE }} />
+        <p className="text-sm" style={{ color: BROWN3 }}>Confirming your payment…</p>
       </Screen>
     )
   }
 
-  // ── Webhook still pending after all retries ───────────────────────────────
   if (exhausted) {
     return (
       <Screen>
         <Icon>⏳</Icon>
-        <h1 className="text-xl font-semibold text-white mb-2">Still activating…</h1>
-        <p className="text-gray-400 text-sm mb-6">
+        <h1 className="text-xl mb-2" style={{ color: BROWN, fontFamily: "'Instrument Sans', sans-serif", fontWeight: 500 }}>Still activating…</h1>
+        <p className="text-sm mb-6" style={{ color: BROWN3 }}>
           Your payment was received. Plan activation usually takes a few seconds —
           refresh in a moment to see your updated plan.
         </p>
         <button
-          className="inline-block px-6 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-semibold rounded-lg transition-colors"
+          className="inline-block px-6 py-2.5 text-sm font-semibold rounded-lg transition-colors text-white active:scale-95"
+          style={{ background: `linear-gradient(135deg, ${ORANGE}, ${AMBER})` }}
           onClick={() => window.location.reload()}
         >
           Refresh
@@ -105,50 +109,51 @@ export default function PaymentSuccess() {
     )
   }
 
-  // ── Monthly ───────────────────────────────────────────────────────────────
   if (plan === 'monthly') {
     return (
       <Screen>
         <Icon>✅</Icon>
         <Kicker>Payment successful</Kicker>
-        <h1 className="text-2xl font-semibold text-white mb-1">Monthly Plan</h1>
-        <p className="text-gray-400 text-sm mb-8">Renews automatically · cancel any time</p>
-        <a href="/" className="inline-block px-6 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-semibold rounded-lg transition-colors">Go to app</a>
+        <h1 className="text-2xl mb-1" style={{ color: BROWN, fontFamily: "'Instrument Sans', sans-serif", fontWeight: 500 }}>Monthly Plan</h1>
+        <p className="text-sm mb-8" style={{ color: BROWN3 }}>Renews automatically · cancel any time</p>
+        <a href="/" className="inline-block px-6 py-2.5 text-sm font-semibold rounded-lg transition-colors text-white active:scale-95" style={{ background: `linear-gradient(135deg, ${ORANGE}, ${AMBER})` }}>
+          Go to app
+        </a>
       </Screen>
     )
   }
 
-  // ── Lifetime ──────────────────────────────────────────────────────────────
   if (plan === 'lifetime') {
     return (
       <Screen>
         <Icon>🎉</Icon>
         <Kicker>Payment successful</Kicker>
-        <h1 className="text-2xl font-semibold text-white mb-1">Lifetime Access</h1>
-        <p className="text-gray-400 text-sm mb-8">One-time purchase · no renewal</p>
-        <a href="/" className="inline-block px-6 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-semibold rounded-lg transition-colors">Go to app</a>
+        <h1 className="text-2xl mb-1" style={{ color: BROWN, fontFamily: "'Instrument Sans', sans-serif", fontWeight: 500 }}>Lifetime Access</h1>
+        <p className="text-sm mb-8" style={{ color: BROWN3 }}>One-time purchase · no renewal</p>
+        <a href="/" className="inline-block px-6 py-2.5 text-sm font-semibold rounded-lg transition-colors text-white active:scale-95" style={{ background: `linear-gradient(135deg, ${ORANGE}, ${AMBER})` }}>
+          Go to app
+        </a>
       </Screen>
     )
   }
 
-  // ── Fallback (unexpected state) ───────────────────────────────────────────
   return (
     <Screen>
       <Icon>✅</Icon>
-      <h1 className="text-xl font-semibold text-white mb-2">Payment received</h1>
-      <p className="text-gray-400 text-sm mb-6">Your account is being updated.</p>
-      <a href="/" className="btn-primary">Go to app</a>
+      <h1 className="text-xl mb-2" style={{ color: BROWN, fontFamily: "'Instrument Sans', sans-serif", fontWeight: 500 }}>Payment received</h1>
+      <p className="text-sm mb-6" style={{ color: BROWN3 }}>Your account is being updated.</p>
+      <a href="/" className="inline-block px-6 py-2.5 text-sm font-semibold rounded-lg text-white" style={{ background: `linear-gradient(135deg, ${ORANGE}, ${AMBER})` }}>
+        Go to app
+      </a>
     </Screen>
   )
 }
 
-// ── Shared layout primitives ──────────────────────────────────────────────────
-
 function Screen({ children }) {
   return (
     <div
-      className="min-h-screen bg-gray-950 flex flex-col items-center justify-center px-4 text-center"
-      style={{ fontFamily: "'IBM Plex Mono', monospace" }}
+      className="min-h-screen flex flex-col items-center justify-center px-4 text-center"
+      style={{ backgroundColor: BG, fontFamily: "'Inter', system-ui, sans-serif" }}
     >
       <div className="max-w-sm w-full flex flex-col items-center">
         {children}
@@ -163,7 +168,7 @@ function Icon({ children }) {
 
 function Kicker({ children }) {
   return (
-    <p className="text-xs uppercase tracking-widest text-emerald-400 font-semibold mb-2">
+    <p className="text-xs uppercase tracking-widest font-semibold mb-2" style={{ color: ORANGE }}>
       {children}
     </p>
   )

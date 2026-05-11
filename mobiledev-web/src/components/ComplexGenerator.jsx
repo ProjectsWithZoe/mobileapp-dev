@@ -9,32 +9,43 @@ import { getStripeLink } from "../lib/stripe";
 import AuthModal from "./AuthModal";
 import SavedPrompts from "./SavedPrompts";
 
+// ─── DESIGN TOKENS ───────────────────────────────────────────────────────────
+const ORANGE = "#EA580C"
+const AMBER  = "#FB923C"
+const BROWN  = "#1C0A02"
+const BROWN2 = "#5C2E0A"
+const BROWN3 = "#9A6040"
+const BG     = "#FFFBF7"
+const SURF   = "#FFFFFF"
+const SURF2  = "#FFF5EC"
+const BORDER = "#E8CFBA"
+
 // ─── CONSTANTS ───────────────────────────────────────────────────────────────
 
 const USE_CASES = [
-  { id: "mobile", label: "📱 Mobile App", icon: "📱", desc: "React Native-style mobile UI" },
-  { id: "dashboard", label: "📊 Dashboard", icon: "📊", desc: "Data-rich admin interface" },
-  { id: "landing", label: "🚀 Landing Page", icon: "🚀", desc: "Marketing & conversion focused" },
-  { id: "saas", label: "⚙️ SaaS Product", icon: "⚙️", desc: "Full-featured web app" },
-  { id: "portfolio", label: "🎨 Portfolio", icon: "🎨", desc: "Personal or agency showcase" },
-  { id: "ecommerce", label: "🛍️ E-Commerce", icon: "🛍️", desc: "Product & checkout flows" },
+  { id: "mobile",    label: "📱 Mobile App",   icon: "📱", desc: "React Native-style mobile UI" },
+  { id: "dashboard", label: "📊 Dashboard",     icon: "📊", desc: "Data-rich admin interface" },
+  { id: "landing",   label: "🚀 Landing Page",  icon: "🚀", desc: "Marketing & conversion focused" },
+  { id: "saas",      label: "⚙️ SaaS Product",  icon: "⚙️", desc: "Full-featured web app" },
+  { id: "portfolio", label: "🎨 Portfolio",      icon: "🎨", desc: "Personal or agency showcase" },
+  { id: "ecommerce", label: "🛍️ E-Commerce",    icon: "🛍️", desc: "Product & checkout flows" },
 ];
 
 const COLOR_PALETTES = [
   { name: "Midnight", colors: ["#0F0F23", "#6C63FF", "#FF6584"], desc: "Electric violet + coral" },
-  { name: "Forest", colors: ["#1A2F23", "#4CAF7D", "#F5C842"], desc: "Mint green + golden yellow" },
-  { name: "Ember", colors: ["#1C1410", "#E85D04", "#FFBA08"], desc: "Burnt orange + amber" },
-  { name: "Ocean", colors: ["#03045E", "#0096C7", "#ADE8F4"], desc: "Ocean blue + sky teal" },
-  { name: "Blush", colors: ["#2D1B2E", "#E040FB", "#F8BBD9"], desc: "Neon magenta + soft pink" },
-  { name: "Slate", colors: ["#0D1117", "#58A6FF", "#3FB950"], desc: "Electric blue + neon green" },
-  { name: "Sunset", colors: ["#1A0A00", "#FF6B35", "#FFE66D"], desc: "Sunset orange + lemon" },
-  { name: "Arctic", colors: ["#0A1628", "#00D4FF", "#B8FFF9"], desc: "Ice blue + crystal teal" },
+  { name: "Forest",   colors: ["#1A2F23", "#4CAF7D", "#F5C842"], desc: "Mint green + golden yellow" },
+  { name: "Ember",    colors: ["#1C1410", "#E85D04", "#FFBA08"], desc: "Burnt orange + amber" },
+  { name: "Ocean",    colors: ["#03045E", "#0096C7", "#ADE8F4"], desc: "Ocean blue + sky teal" },
+  { name: "Blush",    colors: ["#2D1B2E", "#E040FB", "#F8BBD9"], desc: "Neon magenta + soft pink" },
+  { name: "Slate",    colors: ["#0D1117", "#58A6FF", "#3FB950"], desc: "Electric blue + neon green" },
+  { name: "Sunset",   colors: ["#1A0A00", "#FF6B35", "#FFE66D"], desc: "Sunset orange + lemon" },
+  { name: "Arctic",   colors: ["#0A1628", "#00D4FF", "#B8FFF9"], desc: "Ice blue + crystal teal" },
 ];
 
 const COMPLEXITY_LEVELS = [
-  { id: "simple", label: "Simple", desc: "1–2 screens, core feature only", screens: "1–2" },
-  { id: "standard", label: "Standard", desc: "3–4 screens, common patterns", screens: "3–4" },
-  { id: "advanced", label: "Advanced", desc: "5+ screens, full feature set", screens: "5+" },
+  { id: "simple",   label: "Simple",   desc: "1–2 screens, core feature only", screens: "1–2" },
+  { id: "standard", label: "Standard", desc: "3–4 screens, common patterns",   screens: "3–4" },
+  { id: "advanced", label: "Advanced", desc: "5+ screens, full feature set",    screens: "5+" },
 ];
 
 const STYLE_TOKENS_BY_USECASE = {
@@ -126,9 +137,9 @@ const STYLE_TOKENS_BY_USECASE = {
 
 const TECH_OPTIONS = [
   { id: "react-tailwind", label: "React + Tailwind", default: true },
-  { id: "react-css", label: "React + CSS Modules" },
-  { id: "html-vanilla", label: "HTML + Vanilla JS" },
-  { id: "nextjs", label: "Next.js + Tailwind" },
+  { id: "react-css",      label: "React + CSS Modules" },
+  { id: "html-vanilla",   label: "HTML + Vanilla JS" },
+  { id: "nextjs",         label: "Next.js + Tailwind" },
 ];
 
 // ─── PROMPT BUILDERS ─────────────────────────────────────────────────────────
@@ -368,10 +379,10 @@ Begin with \`import { useState, ... } from 'react'\`.
 `.trim();
 
 const PROMPT_BUILDERS = {
-  mobile: buildMobilePrompt,
+  mobile:    buildMobilePrompt,
   dashboard: buildDashboardPrompt,
-  landing: buildLandingPrompt,
-  saas: buildSaaSPrompt,
+  landing:   buildLandingPrompt,
+  saas:      buildSaaSPrompt,
   portfolio: buildPortfolioPrompt,
   ecommerce: buildEcommercePrompt,
 };
@@ -382,11 +393,11 @@ const StepLabel = ({ number, label, active }) => (
   <div className="flex items-center gap-2 mb-3">
     <div
       className="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold shrink-0 transition-all duration-200"
-      style={{ backgroundColor: active ? "#6C63FF" : "#1f2937", color: active ? "white" : "#6b7280" }}
+      style={{ backgroundColor: active ? ORANGE : BORDER, color: active ? "white" : BROWN3 }}
     >
       {number}
     </div>
-    <span className={`text-xs uppercase tracking-widest font-semibold ${active ? "text-white" : "text-gray-500"}`}>
+    <span className="text-xs uppercase tracking-widest font-semibold" style={{ color: active ? BROWN : BROWN3 }}>
       {label}
     </span>
   </div>
@@ -398,12 +409,12 @@ const PalettePreview = ({ colors, name }) => (
       {colors.map((c, i) => (
         <div
           key={c}
-          className="w-4 h-4 rounded-full border-2 border-gray-900"
-          style={{ backgroundColor: c, marginLeft: i > 0 ? "-4px" : 0, zIndex: colors.length - i }}
+          className="w-4 h-4 rounded-full border-2"
+          style={{ backgroundColor: c, borderColor: SURF, marginLeft: i > 0 ? "-4px" : 0, zIndex: colors.length - i }}
         />
       ))}
     </div>
-    <span className="text-xs text-gray-400">{name}</span>
+    <span className="text-xs" style={{ color: BROWN3 }}>{name}</span>
   </div>
 );
 
@@ -412,34 +423,32 @@ const PalettePreview = ({ colors, name }) => (
 const DEMO_STORAGE_KEY = "humble-ui-demo-used";
 
 export default function PromptGenerator({ demoMode = false, onDemoSignUp, onExitDemo }) {
-  const [appIdea, setAppIdea] = useState("");
+  const [appIdea, setAppIdea]                 = useState("");
   const [selectedUseCase, setSelectedUseCase] = useState("mobile");
   const [selectedPalette, setSelectedPalette] = useState(0);
   const [selectedComplexity, setSelectedComplexity] = useState("standard");
-  const [extraContext, setExtraContext] = useState("");
+  const [extraContext, setExtraContext]        = useState("");
   const [showExtraContext, setShowExtraContext] = useState(false);
   const [generatedPrompt, setGeneratedPrompt] = useState("");
-  const [copied, setCopied] = useState(false);
+  const [copied, setCopied]                   = useState(false);
   const [promptGenerated, setPromptGenerated] = useState(false);
 
-  // Auth & save state
   const { user, loading: authLoading, signIn, signOut } = useAuth();
   const { prompts, loading: promptsLoading, savePrompt, deletePrompt } = useSavedPrompts(user?.id);
   const { insertPrompt } = useGeneratedPrompts(user?.id);
   const { isPaid, withinLimit, generationsUsed, incrementGeneration, loading: profileLoading, profile } = useProfile(user?.id);
-  const [showAuthModal, setShowAuthModal] = useState(false);
+  const [showAuthModal, setShowAuthModal]     = useState(false);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const [showContactModal, setShowContactModal] = useState(false);
-  const [contactForm, setContactForm] = useState({ name: "", email: "", message: "" });
-  const [contactStatus, setContactStatus] = useState("idle");
-  // Demo mode: if they've already used their one free generation, show paywall immediately
+  const [contactForm, setContactForm]         = useState({ name: "", email: "", message: "" });
+  const [contactStatus, setContactStatus]     = useState("idle");
+
   useEffect(() => {
     if (demoMode && localStorage.getItem(DEMO_STORAGE_KEY) === "true") {
       setShowUpgradeModal(true);
     }
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // After demo sign-up: auto-open pricing modal once profile loads
   useEffect(() => {
     if (!profile) return;
     if (localStorage.getItem('humble-ui-show-pricing') !== 'true') return;
@@ -448,9 +457,9 @@ export default function PromptGenerator({ demoMode = false, onDemoSignUp, onExit
   }, [profile, isPaid]);
 
   const [showSaveInput, setShowSaveInput] = useState(false);
-  const [saveName, setSaveName] = useState("");
-  const [saving, setSaving] = useState(false);
-  const [saveError, setSaveError] = useState("");
+  const [saveName, setSaveName]           = useState("");
+  const [saving, setSaving]               = useState(false);
+  const [saveError, setSaveError]         = useState("");
   const saveInputRef = useRef(null);
 
   const handleSaveClick = useCallback(() => {
@@ -495,19 +504,18 @@ export default function PromptGenerator({ demoMode = false, onDemoSignUp, onExit
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, []);
 
-  const palette = COLOR_PALETTES[selectedPalette];
+  const palette    = COLOR_PALETTES[selectedPalette];
   const complexity = COMPLEXITY_LEVELS.find((c) => c.id === selectedComplexity);
   const styleTokens = STYLE_TOKENS_BY_USECASE[selectedUseCase] || STYLE_TOKENS_BY_USECASE.mobile;
   const canGenerate = appIdea.trim().length > 0;
-  const charCount = generatedPrompt.length;
+  const charCount   = generatedPrompt.length;
 
   const generatePrompt = useCallback(async () => {
     if (!canGenerate) return;
-
     if (demoMode) {
       if (localStorage.getItem(DEMO_STORAGE_KEY) === "true") { setShowUpgradeModal(true); return; }
     } else if (user && !profile) {
-      return; // profile not yet loaded — button should already be disabled, belt-and-suspenders
+      return;
     } else if (!withinLimit) {
       setShowUpgradeModal(true); return;
     }
@@ -517,28 +525,15 @@ export default function PromptGenerator({ demoMode = false, onDemoSignUp, onExit
     const prompt = builder({ appIdea, palette, styles: randomStyles, complexity, extraContext });
     setGeneratedPrompt(prompt);
     setPromptGenerated(true);
-    capture("prompt_generated", {
-      use_case: selectedUseCase,
-      complexity: selectedComplexity,
-      palette: palette.name,
-      demo: demoMode,
-    });
+    capture("prompt_generated", { use_case: selectedUseCase, complexity: selectedComplexity, palette: palette.name, demo: demoMode });
 
     if (demoMode) {
       localStorage.setItem(DEMO_STORAGE_KEY, "true");
-      // Show paywall after a beat so the user can see their generated prompt first
       setTimeout(() => setShowUpgradeModal(true), 900);
     } else {
       await Promise.all([
         incrementGeneration(),
-        insertPrompt({
-          app_idea: appIdea,
-          use_case: selectedUseCase,
-          palette_name: palette.name,
-          complexity: selectedComplexity,
-          extra_context: extraContext,
-          prompt_text: prompt,
-        }),
+        insertPrompt({ app_idea: appIdea, use_case: selectedUseCase, palette_name: palette.name, complexity: selectedComplexity, extra_context: extraContext, prompt_text: prompt }),
       ]);
     }
   }, [appIdea, selectedUseCase, selectedComplexity, palette, complexity, styleTokens, extraContext, canGenerate, withinLimit, demoMode, incrementGeneration, insertPrompt]);
@@ -550,28 +545,39 @@ export default function PromptGenerator({ demoMode = false, onDemoSignUp, onExit
     capture("prompt_copied", { use_case: selectedUseCase });
   }, [generatedPrompt, selectedUseCase]);
 
+  const inputStyle = {
+    backgroundColor: SURF,
+    border: `1px solid ${BORDER}`,
+    color: BROWN,
+    colorScheme: 'light',
+    fontFamily: "'Inter', system-ui, sans-serif",
+  };
+
   return (
-    <div className="min-h-screen bg-gray-950 text-white" style={{ fontFamily: "'IBM Plex Mono', monospace" }}>
+    <div className="min-h-screen" style={{ backgroundColor: BG, color: BROWN, fontFamily: "'Inter', system-ui, sans-serif" }}>
       {/* Top bar */}
-      <div className="border-b border-gray-800 px-6 py-3 flex items-center justify-between sticky top-0 bg-gray-950 z-10">
+      <div
+        className="px-6 py-3 flex items-center justify-between sticky top-0 z-10"
+        style={{ borderBottom: `1px solid ${BORDER}`, backgroundColor: BG, backdropFilter: 'blur(14px)' }}
+      >
         <div className="flex items-center gap-3">
           {demoMode && (
             <button
               onClick={onExitDemo}
-              className="text-xs text-gray-500 hover:text-gray-300 transition-colors mr-1"
-              style={{ background: "none", border: "none", padding: 0, cursor: "pointer" }}
+              className="text-xs transition-colors mr-1"
+              style={{ background: "none", border: "none", padding: 0, cursor: "pointer", color: BROWN3 }}
             >
               ← Back
             </button>
           )}
           <div className="flex gap-1.5">
-            <div className="w-3 h-3 rounded-full bg-red-500 opacity-80" />
-            <div className="w-3 h-3 rounded-full bg-yellow-500 opacity-80" />
-            <div className="w-3 h-3 rounded-full bg-green-500 opacity-80" />
+            <div className="w-3 h-3 rounded-full bg-red-400 opacity-80" />
+            <div className="w-3 h-3 rounded-full bg-yellow-400 opacity-80" />
+            <div className="w-3 h-3 rounded-full bg-green-400 opacity-80" />
           </div>
-          <span className="text-gray-500 text-xs">prompt-generator.jsx</span>
+          <span className="text-xs" style={{ color: BROWN3, fontFamily: "'IBM Plex Mono', monospace" }}>prompt-generator.jsx</span>
           {demoMode && (
-            <span className="text-xs px-2 py-0.5 rounded-full font-bold" style={{ backgroundColor: "#6C63FF20", color: "#6C63FF" }}>
+            <span className="text-xs px-2 py-0.5 rounded-full font-semibold" style={{ backgroundColor: `${ORANGE}15`, color: ORANGE }}>
               Demo · 1 free generation
             </span>
           )}
@@ -579,19 +585,19 @@ export default function PromptGenerator({ demoMode = false, onDemoSignUp, onExit
         <div className="flex items-center gap-2">
           {isSupabaseConfigured && (
             authLoading ? (
-              <div className="w-4 h-4 rounded-full border-2 border-gray-700 border-t-gray-400 animate-spin" />
+              <div className="w-4 h-4 rounded-full border-2 animate-spin" style={{ borderColor: BORDER, borderTopColor: ORANGE }} />
             ) : user ? (
               <>
-                <span className="text-gray-500 text-xs hidden sm:inline truncate max-w-[140px]">{user.email}</span>
+                <span className="text-xs hidden sm:inline truncate max-w-[140px]" style={{ color: BROWN3 }}>{user.email}</span>
                 {isPaid ? (
-                  <span className="text-xs px-2 py-0.5 rounded-full font-bold" style={{ backgroundColor: "#6C63FF20", color: "#6C63FF" }}>
+                  <span className="text-xs px-2 py-0.5 rounded-full font-semibold" style={{ backgroundColor: `${ORANGE}15`, color: ORANGE }}>
                     Pro
                   </span>
                 ) : (
                   <button
                     onClick={() => setShowUpgradeModal(true)}
-                    className="text-xs px-2 py-0.5 rounded-full font-bold transition-colors hover:opacity-80"
-                    style={{ backgroundColor: "#1f2937", color: "#6b7280" }}
+                    className="text-xs px-2 py-0.5 rounded-full font-semibold transition-colors hover:opacity-80"
+                    style={{ backgroundColor: SURF2, color: BROWN3 }}
                     title={`${generationsUsed}/1 free generation used`}
                   >
                     Free · {generationsUsed}/1
@@ -599,13 +605,15 @@ export default function PromptGenerator({ demoMode = false, onDemoSignUp, onExit
                 )}
                 <button
                   onClick={() => { setContactForm({ name: "", email: user?.email ?? "", message: "" }); setContactStatus("idle"); setShowContactModal(true); }}
-                  className="text-xs px-2.5 py-1 rounded-lg border border-gray-700 text-gray-400 hover:border-gray-500 hover:text-gray-200 transition-all duration-150"
+                  className="text-xs px-2.5 py-1 rounded-lg transition-all duration-150"
+                  style={{ border: `1px solid ${BORDER}`, color: BROWN3, background: 'none' }}
                 >
                   Contact
                 </button>
                 <button
                   onClick={signOut}
-                  className="text-xs px-2.5 py-1 rounded-lg border border-gray-700 text-gray-400 hover:border-gray-500 hover:text-gray-200 transition-all duration-150"
+                  className="text-xs px-2.5 py-1 rounded-lg transition-all duration-150"
+                  style={{ border: `1px solid ${BORDER}`, color: BROWN3, background: 'none' }}
                 >
                   Sign out
                 </button>
@@ -613,8 +621,8 @@ export default function PromptGenerator({ demoMode = false, onDemoSignUp, onExit
             ) : (
               <button
                 onClick={() => setShowAuthModal(true)}
-                className="text-xs px-3 py-1.5 rounded-lg font-bold transition-all duration-150 active:scale-95"
-                style={{ backgroundColor: "#6C63FF", color: "white" }}
+                className="text-xs px-3 py-1.5 rounded-lg font-semibold transition-all duration-150 active:scale-95 text-white"
+                style={{ background: `linear-gradient(135deg, ${ORANGE}, ${AMBER})` }}
               >
                 Sign in
               </button>
@@ -628,8 +636,10 @@ export default function PromptGenerator({ demoMode = false, onDemoSignUp, onExit
         {/* LEFT COLUMN — CONFIG */}
         <div className="space-y-7">
           <div>
-            <h1 className="text-2xl font-bold text-white leading-tight">HumbleUI Prompt Generator</h1>
-            <p className="text-gray-500 text-sm mt-1">Generate senior-level dev prompts for any use case</p>
+            <h1 className="text-2xl leading-tight" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 500, color: BROWN }}>
+              HumbleUI Prompt Generator
+            </h1>
+            <p className="text-sm mt-1" style={{ color: BROWN3 }}>Generate senior-level dev prompts for any use case</p>
           </div>
 
           {/* Step 1: Use Case */}
@@ -640,16 +650,15 @@ export default function PromptGenerator({ demoMode = false, onDemoSignUp, onExit
                 <button
                   key={uc.id}
                   onClick={() => setSelectedUseCase(uc.id)}
-                  className={`p-3 rounded-xl border text-left transition-all duration-150 active:scale-95 ${
-                    selectedUseCase === uc.id
-                      ? "border-transparent text-white"
-                      : "border-gray-800 bg-gray-900 hover:border-gray-700 text-gray-400"
-                  }`}
-                  style={selectedUseCase === uc.id ? { backgroundColor: "#6C63FF20", borderColor: "#6C63FF" } : {}}
+                  className="p-3 rounded-xl text-left transition-all duration-150 active:scale-95"
+                  style={{
+                    border: `1px solid ${selectedUseCase === uc.id ? ORANGE : BORDER}`,
+                    backgroundColor: selectedUseCase === uc.id ? `${ORANGE}08` : SURF,
+                  }}
                 >
                   <div className="text-base mb-0.5">{uc.icon}</div>
-                  <div className="text-xs font-bold text-white">{uc.label.split(" ").slice(1).join(" ")}</div>
-                  <div className="text-xs text-gray-500 leading-tight mt-0.5">{uc.desc}</div>
+                  <div className="text-xs font-semibold" style={{ color: BROWN }}>{uc.label.split(" ").slice(1).join(" ")}</div>
+                  <div className="text-xs leading-tight mt-0.5" style={{ color: BROWN3 }}>{uc.desc}</div>
                 </button>
               ))}
             </div>
@@ -662,19 +671,21 @@ export default function PromptGenerator({ demoMode = false, onDemoSignUp, onExit
               value={appIdea}
               onChange={(e) => setAppIdea(e.target.value)}
               placeholder={`e.g. ${
-                selectedUseCase === "mobile" ? "a habit tracker with streaks and reminders" :
+                selectedUseCase === "mobile"    ? "a habit tracker with streaks and reminders" :
                 selectedUseCase === "dashboard" ? "a SaaS analytics dashboard for a B2B startup" :
-                selectedUseCase === "landing" ? "a project management tool for remote teams" :
-                selectedUseCase === "saas" ? "a team collaboration and task management app" :
+                selectedUseCase === "landing"   ? "a project management tool for remote teams" :
+                selectedUseCase === "saas"      ? "a team collaboration and task management app" :
                 selectedUseCase === "portfolio" ? "a UX designer with 5 years of experience" :
                 "a premium sneaker store with limited drops"
               }`}
               rows={3}
-              className="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-3 text-white placeholder-gray-600 focus:outline-none focus:border-gray-500 text-sm resize-none"
+              className="w-full rounded-xl px-4 py-3 text-sm focus:outline-none resize-none transition-colors"
+              style={{ ...inputStyle, borderColor: appIdea ? ORANGE : BORDER }}
             />
             <button
               onClick={() => setShowExtraContext(!showExtraContext)}
-              className="mt-2 text-xs text-gray-500 hover:text-gray-300 transition-colors flex items-center gap-1"
+              className="mt-2 text-xs flex items-center gap-1 transition-colors"
+              style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', color: BROWN3 }}
             >
               <span>{showExtraContext ? "▾" : "▸"}</span>
               {showExtraContext ? "Hide" : "Add"} extra context (optional)
@@ -685,7 +696,8 @@ export default function PromptGenerator({ demoMode = false, onDemoSignUp, onExit
                 onChange={(e) => setExtraContext(e.target.value)}
                 placeholder="Target audience, specific features, brand tone, technical constraints..."
                 rows={2}
-                className="mt-2 w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-3 text-white placeholder-gray-600 focus:outline-none focus:border-gray-500 text-sm resize-none"
+                className="mt-2 w-full rounded-xl px-4 py-3 text-sm focus:outline-none resize-none transition-colors"
+                style={inputStyle}
               />
             )}
           </div>
@@ -698,15 +710,14 @@ export default function PromptGenerator({ demoMode = false, onDemoSignUp, onExit
                 <button
                   key={c.id}
                   onClick={() => setSelectedComplexity(c.id)}
-                  className={`flex-1 p-3 rounded-xl border text-center transition-all duration-150 active:scale-95 ${
-                    selectedComplexity === c.id
-                      ? "border-transparent text-white"
-                      : "border-gray-800 bg-gray-900 hover:border-gray-700"
-                  }`}
-                  style={selectedComplexity === c.id ? { backgroundColor: "#6C63FF20", borderColor: "#6C63FF" } : {}}
+                  className="flex-1 p-3 rounded-xl text-center transition-all duration-150 active:scale-95"
+                  style={{
+                    border: `1px solid ${selectedComplexity === c.id ? ORANGE : BORDER}`,
+                    backgroundColor: selectedComplexity === c.id ? `${ORANGE}08` : SURF,
+                  }}
                 >
-                  <div className="text-xs font-bold text-white">{c.label}</div>
-                  <div className="text-xs text-gray-500 mt-0.5">{c.screens} screens</div>
+                  <div className="text-xs font-semibold" style={{ color: BROWN }}>{c.label}</div>
+                  <div className="text-xs mt-0.5" style={{ color: BROWN3 }}>{c.screens} screens</div>
                 </button>
               ))}
             </div>
@@ -720,24 +731,24 @@ export default function PromptGenerator({ demoMode = false, onDemoSignUp, onExit
                 <button
                   key={p.name}
                   onClick={() => setSelectedPalette(i)}
-                  className={`flex items-center gap-3 p-3 rounded-xl border transition-all duration-150 active:scale-95 text-left ${
-                    selectedPalette === i
-                      ? "border-white bg-gray-800"
-                      : "border-gray-800 bg-gray-900 hover:border-gray-700"
-                  }`}
+                  className="flex items-center gap-3 p-3 rounded-xl text-left transition-all duration-150 active:scale-95"
+                  style={{
+                    border: `1px solid ${selectedPalette === i ? ORANGE : BORDER}`,
+                    backgroundColor: selectedPalette === i ? SURF2 : SURF,
+                  }}
                 >
                   <div className="flex shrink-0">
                     {p.colors.map((c, ci) => (
                       <div
                         key={c}
-                        className="w-3.5 h-3.5 rounded-full border-2 border-gray-900"
-                        style={{ backgroundColor: c, marginLeft: ci > 0 ? "-3px" : 0 }}
+                        className="w-3.5 h-3.5 rounded-full border-2"
+                        style={{ backgroundColor: c, borderColor: SURF, marginLeft: ci > 0 ? "-3px" : 0 }}
                       />
                     ))}
                   </div>
                   <div>
-                    <div className="text-xs font-bold text-white">{p.name}</div>
-                    <div className="text-xs text-gray-500 leading-tight">{p.desc}</div>
+                    <div className="text-xs font-semibold" style={{ color: BROWN }}>{p.name}</div>
+                    <div className="text-xs leading-tight" style={{ color: BROWN3 }}>{p.desc}</div>
                   </div>
                 </button>
               ))}
@@ -748,8 +759,8 @@ export default function PromptGenerator({ demoMode = false, onDemoSignUp, onExit
           <button
             onClick={generatePrompt}
             disabled={!canGenerate || (!!user && profileLoading)}
-            className="w-full py-4 rounded-xl font-bold text-sm transition-all duration-200 active:scale-95 disabled:opacity-30 disabled:cursor-not-allowed"
-            style={{ backgroundColor: (!withinLimit || canGenerate) ? "#6C63FF" : "#374151", color: "white" }}
+            className="w-full py-4 rounded-xl font-semibold text-sm text-white transition-all duration-200 active:scale-95 disabled:opacity-30 disabled:cursor-not-allowed"
+            style={{ background: `linear-gradient(135deg, ${ORANGE}, ${AMBER})` }}
           >
             {!withinLimit
               ? "🔒 Upgrade to Generate More"
@@ -760,29 +771,33 @@ export default function PromptGenerator({ demoMode = false, onDemoSignUp, onExit
         {/* RIGHT COLUMN — OUTPUT */}
         <div className="flex flex-col">
           {generatedPrompt ? (
-            <div className="border border-gray-800 rounded-2xl overflow-hidden flex flex-col h-full">
+            <div className="rounded-2xl overflow-hidden flex flex-col h-full" style={{ border: `1px solid ${BORDER}` }}>
               {/* Output header */}
-              <div className="flex items-center justify-between px-4 py-3 bg-gray-900 border-b border-gray-800 shrink-0">
+              <div
+                className="flex items-center justify-between px-4 py-3 shrink-0"
+                style={{ backgroundColor: SURF2, borderBottom: `1px solid ${BORDER}` }}
+              >
                 <div className="flex items-center gap-3">
                   <PalettePreview colors={palette.colors} name={palette.name} />
-                  <div className="w-px h-4 bg-gray-700" />
-                  <span className="text-xs text-gray-500">
+                  <div className="w-px h-4" style={{ backgroundColor: BORDER }} />
+                  <span className="text-xs" style={{ color: BROWN3 }}>
                     {USE_CASES.find(u => u.id === selectedUseCase)?.label} · {complexity.label}
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-xs text-gray-600">{charCount.toLocaleString()} chars</span>
+                  <span className="text-xs" style={{ color: BROWN3 }}>{charCount.toLocaleString()} chars</span>
                   <button
                     onClick={copyToClipboard}
-                    className="text-xs px-3 py-1.5 rounded-lg transition-all duration-150 active:scale-95 font-bold"
-                    style={{ backgroundColor: copied ? "#3FB950" : "#6C63FF", color: "white" }}
+                    className="text-xs px-3 py-1.5 rounded-lg transition-all duration-150 active:scale-95 font-semibold text-white"
+                    style={{ backgroundColor: copied ? "#16a34a" : ORANGE }}
                   >
                     {copied ? "✓ Copied!" : "Copy"}
                   </button>
                   {isSupabaseConfigured && (
                     <button
                       onClick={handleSaveClick}
-                      className="text-xs px-3 py-1.5 rounded-lg transition-all duration-150 active:scale-95 font-bold border border-gray-700 text-gray-300 hover:border-gray-500 hover:text-white"
+                      className="text-xs px-3 py-1.5 rounded-lg transition-all duration-150 active:scale-95 font-semibold"
+                      style={{ border: `1px solid ${BORDER}`, color: BROWN3, background: 'none' }}
                     >
                       💾 Save
                     </button>
@@ -792,7 +807,7 @@ export default function PromptGenerator({ demoMode = false, onDemoSignUp, onExit
 
               {/* Inline save name input */}
               {showSaveInput && (
-                <div className="px-4 py-3 bg-gray-900 border-b border-gray-800 flex flex-col gap-2">
+                <div className="px-4 py-3 flex flex-col gap-2" style={{ backgroundColor: SURF2, borderBottom: `1px solid ${BORDER}` }}>
                   <div className="flex items-center gap-2">
                     <input
                       ref={saveInputRef}
@@ -802,54 +817,62 @@ export default function PromptGenerator({ demoMode = false, onDemoSignUp, onExit
                       onKeyDown={(e) => { if (e.key === "Enter") handleSaveConfirm(); if (e.key === "Escape") setShowSaveInput(false); }}
                       placeholder="Name this prompt…"
                       maxLength={80}
-                      className="flex-1 bg-gray-950 border border-gray-700 rounded-lg px-3 py-1.5 text-white placeholder-gray-600 focus:outline-none focus:border-gray-500 text-xs"
+                      className="flex-1 rounded-lg px-3 py-1.5 text-xs focus:outline-none transition-colors"
+                      style={{ ...inputStyle, fontSize: '12px' }}
                     />
                     <button
                       onClick={handleSaveConfirm}
                       disabled={saving || !saveName.trim()}
-                      className="text-xs px-3 py-1.5 rounded-lg font-bold transition-all duration-150 active:scale-95 disabled:opacity-40"
-                      style={{ backgroundColor: "#3FB950", color: "white" }}
+                      className="text-xs px-3 py-1.5 rounded-lg font-semibold transition-all duration-150 active:scale-95 disabled:opacity-40 text-white"
+                      style={{ backgroundColor: "#16a34a" }}
                     >
                       {saving ? "…" : "Save ✓"}
                     </button>
                     <button
                       onClick={() => setShowSaveInput(false)}
-                      className="text-gray-500 hover:text-gray-300 transition-colors text-sm px-1"
+                      className="text-sm px-1 transition-colors"
+                      style={{ background: 'none', border: 'none', cursor: 'pointer', color: BROWN3 }}
                     >
                       ✕
                     </button>
                   </div>
-                  {saveError && <p className="text-xs text-red-400">{saveError}</p>}
+                  {saveError && <p className="text-xs" style={{ color: '#DC2626' }}>{saveError}</p>}
                 </div>
               )}
 
-              {/* Prompt content */}
-              <pre className="p-5 text-xs text-gray-300 whitespace-pre-wrap leading-relaxed bg-gray-950 overflow-y-auto flex-1 max-h-[calc(100vh-50px)]">
+              {/* Prompt content — intentional dark terminal */}
+              <pre
+                className="p-5 text-xs whitespace-pre-wrap leading-relaxed overflow-y-auto flex-1 max-h-[calc(100vh-50px)]"
+                style={{ backgroundColor: BROWN, color: '#F5E6D3', fontFamily: "'IBM Plex Mono', monospace" }}
+              >
                 {generatedPrompt}
               </pre>
 
               {/* Footer hint */}
-              <div className="px-4 py-2.5 bg-gray-900 border-t border-gray-800 shrink-0">
-                <p className="text-xs text-gray-600">
-                  Paste into <span className="text-gray-400">Claude Code</span>, Claude.ai, or any frontier model → get production-ready code
+              <div className="px-4 py-2.5 shrink-0" style={{ backgroundColor: SURF2, borderTop: `1px solid ${BORDER}` }}>
+                <p className="text-xs" style={{ color: BROWN3 }}>
+                  Paste into <span style={{ color: BROWN2 }}>Claude Code</span>, Claude.ai, or any frontier model → get production-ready code
                 </p>
               </div>
             </div>
           ) : (
-            <div className="border border-dashed border-gray-800 rounded-2xl flex-1 flex flex-col items-center justify-center p-12 text-center">
+            <div
+              className="rounded-2xl flex-1 flex flex-col items-center justify-center p-12 text-center"
+              style={{ border: `1px dashed ${BORDER}` }}
+            >
               <div className="text-5xl mb-4">
                 {USE_CASES.find(u => u.id === selectedUseCase)?.icon || "✨"}
               </div>
-              <p className="text-gray-500 text-sm font-bold mb-1">
+              <p className="text-sm font-semibold mb-1" style={{ color: BROWN3 }}>
                 {USE_CASES.find(u => u.id === selectedUseCase)?.label}
               </p>
-              <p className="text-gray-600 text-xs">
+              <p className="text-xs" style={{ color: BROWN3 }}>
                 Fill in the details on the left and hit Generate
               </p>
               <div className="mt-6 flex flex-col gap-1.5 text-left">
                 {["Use case → tailored style tokens", "Complexity → screen count", "Palette → exact hex colors", "Context → sharper output"].map((tip) => (
-                  <div key={tip} className="flex items-center gap-2 text-xs text-gray-600">
-                    <span style={{ color: "#6C63FF" }}>→</span> {tip}
+                  <div key={tip} className="flex items-center gap-2 text-xs" style={{ color: BROWN3 }}>
+                    <span style={{ color: ORANGE }}>→</span> {tip}
                   </div>
                 ))}
               </div>
@@ -882,59 +905,63 @@ export default function PromptGenerator({ demoMode = false, onDemoSignUp, onExit
       {showContactModal && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center px-4"
-          style={{ backgroundColor: "rgba(0,0,0,0.75)", backdropFilter: "blur(4px)" }}
+          style={{ backgroundColor: "rgba(28,10,2,0.55)", backdropFilter: "blur(6px)" }}
           onClick={(e) => { if (e.target === e.currentTarget) setShowContactModal(false); }}
         >
-          <div className="bg-gray-900 border border-gray-700 rounded-2xl p-8 max-w-md w-full relative">
+          <div className="rounded-2xl p-8 max-w-md w-full relative" style={{ backgroundColor: SURF, border: `1px solid ${BORDER}`, boxShadow: '0 24px 60px rgba(92,46,10,0.18)' }}>
             <button
               onClick={() => setShowContactModal(false)}
-              className="absolute top-4 right-4 text-gray-500 hover:text-white transition-colors text-lg leading-none"
+              className="absolute top-4 right-4 transition-colors text-lg leading-none"
+              style={{ background: 'none', border: 'none', cursor: 'pointer', color: BROWN3 }}
             >✕</button>
 
             {contactStatus === "sent" ? (
               <div className="text-center py-6">
                 <div className="text-3xl mb-3">✉️</div>
-                <h3 className="text-white font-bold text-lg mb-2">Message sent!</h3>
-                <p className="text-gray-400 text-sm">We'll get back to you as soon as possible.</p>
+                <h3 className="font-semibold text-lg mb-2" style={{ color: BROWN, fontFamily: "'Instrument Sans', sans-serif" }}>Message sent!</h3>
+                <p className="text-sm" style={{ color: BROWN3 }}>We'll get back to you as soon as possible.</p>
                 <button
                   onClick={() => setShowContactModal(false)}
-                  className="mt-6 px-5 py-2 rounded-lg text-sm font-bold text-white transition-all duration-150 active:scale-95"
-                  style={{ backgroundColor: "#6C63FF" }}
+                  className="mt-6 px-5 py-2 rounded-lg text-sm font-semibold text-white transition-all duration-150 active:scale-95"
+                  style={{ background: `linear-gradient(135deg, ${ORANGE}, ${AMBER})` }}
                 >Close</button>
               </div>
             ) : (
               <>
-                <h3 className="text-white font-bold text-lg mb-1">Contact us</h3>
-                <p className="text-gray-400 text-sm mb-6">We read every message.</p>
+                <h3 className="font-semibold text-lg mb-1" style={{ color: BROWN, fontFamily: "'Instrument Sans', sans-serif" }}>Contact us</h3>
+                <p className="text-sm mb-6" style={{ color: BROWN3 }}>We read every message.</p>
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-xs text-gray-500 mb-1.5">Name</label>
+                    <label className="block text-xs mb-1.5" style={{ color: BROWN3 }}>Name</label>
                     <input
                       type="text"
                       value={contactForm.name}
                       onChange={(e) => setContactForm(f => ({ ...f, name: e.target.value }))}
                       placeholder="Your name"
-                      className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-gray-500 transition-colors"
+                      className="w-full rounded-lg px-3 py-2 text-sm focus:outline-none transition-colors"
+                      style={inputStyle}
                     />
                   </div>
                   <div>
-                    <label className="block text-xs text-gray-500 mb-1.5">Email</label>
+                    <label className="block text-xs mb-1.5" style={{ color: BROWN3 }}>Email</label>
                     <input
                       type="email"
                       value={contactForm.email}
                       onChange={(e) => setContactForm(f => ({ ...f, email: e.target.value }))}
                       placeholder="you@example.com"
-                      className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-gray-500 transition-colors"
+                      className="w-full rounded-lg px-3 py-2 text-sm focus:outline-none transition-colors"
+                      style={inputStyle}
                     />
                   </div>
                   <div>
-                    <label className="block text-xs text-gray-500 mb-1.5">Message</label>
+                    <label className="block text-xs mb-1.5" style={{ color: BROWN3 }}>Message</label>
                     <textarea
                       value={contactForm.message}
                       onChange={(e) => setContactForm(f => ({ ...f, message: e.target.value }))}
                       placeholder="How can we help?"
                       rows={4}
-                      className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-gray-500 transition-colors resize-none"
+                      className="w-full rounded-lg px-3 py-2 text-sm focus:outline-none transition-colors resize-none"
+                      style={inputStyle}
                     />
                   </div>
                 </div>
@@ -947,8 +974,8 @@ export default function PromptGenerator({ demoMode = false, onDemoSignUp, onExit
                     setContactStatus("sent");
                   }}
                   disabled={!contactForm.name.trim() || !contactForm.email.trim() || !contactForm.message.trim()}
-                  className="mt-6 w-full py-2.5 rounded-lg font-bold text-sm text-white transition-all duration-150 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed"
-                  style={{ backgroundColor: "#6C63FF" }}
+                  className="mt-6 w-full py-2.5 rounded-lg font-semibold text-sm text-white transition-all duration-150 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed"
+                  style={{ background: `linear-gradient(135deg, ${ORANGE}, ${AMBER})` }}
                 >
                   Send message →
                 </button>
@@ -962,22 +989,23 @@ export default function PromptGenerator({ demoMode = false, onDemoSignUp, onExit
       {showUpgradeModal && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center px-4"
-          style={{ backgroundColor: "rgba(0,0,0,0.75)", backdropFilter: "blur(4px)" }}
+          style={{ backgroundColor: "rgba(28,10,2,0.55)", backdropFilter: "blur(6px)" }}
           onClick={(e) => { if (e.target === e.currentTarget) setShowUpgradeModal(false); }}
         >
-          <div className="bg-gray-900 border border-gray-700 rounded-2xl p-8 max-w-md w-full relative">
+          <div className="rounded-2xl p-8 max-w-md w-full relative" style={{ backgroundColor: SURF, border: `1px solid ${BORDER}`, boxShadow: '0 24px 60px rgba(92,46,10,0.18)' }}>
             <button
               onClick={() => setShowUpgradeModal(false)}
-              className="absolute top-4 right-4 text-gray-500 hover:text-white transition-colors text-lg leading-none"
+              className="absolute top-4 right-4 transition-colors text-lg leading-none"
+              style={{ background: 'none', border: 'none', cursor: 'pointer', color: BROWN3 }}
             >✕</button>
 
-            <div className="w-10 h-10 rounded-xl flex items-center justify-center mb-4" style={{ backgroundColor: "#6C63FF20" }}>
-              <span style={{ color: "#6C63FF", fontSize: 18 }}>🔒</span>
+            <div className="w-10 h-10 rounded-xl flex items-center justify-center mb-4" style={{ backgroundColor: `${ORANGE}15` }}>
+              <span style={{ color: ORANGE, fontSize: 18 }}>🔒</span>
             </div>
-            <h3 className="text-white font-bold text-lg mb-1">
+            <h3 className="font-semibold text-lg mb-1" style={{ color: BROWN, fontFamily: "'Instrument Sans', sans-serif" }}>
               {demoMode ? "Enjoyed the demo?" : "You've used your free generation"}
             </h3>
-            <p className="text-gray-400 text-sm mb-6">
+            <p className="text-sm mb-6" style={{ color: BROWN3 }}>
               {demoMode
                 ? "Create a free account to get 1 more generation — then onto a paid plan for unlimited."
                 : "Upgrade to keep generating unlimited prompts for any use case."}
@@ -985,8 +1013,8 @@ export default function PromptGenerator({ demoMode = false, onDemoSignUp, onExit
             {demoMode && (
               <button
                 onClick={() => { localStorage.setItem('humble-ui-show-pricing', 'true'); setShowUpgradeModal(false); onDemoSignUp?.(); }}
-                className="w-full py-2.5 rounded-xl font-bold text-sm text-white mb-4 transition-all duration-150 active:scale-95"
-                style={{ backgroundColor: "#3FB950" }}
+                className="w-full py-2.5 rounded-xl font-semibold text-sm text-white mb-4 transition-all duration-150 active:scale-95"
+                style={{ background: `linear-gradient(135deg, ${ORANGE}, ${AMBER})` }}
               >
                 Create free account →
               </button>
@@ -996,43 +1024,43 @@ export default function PromptGenerator({ demoMode = false, onDemoSignUp, onExit
               <>
                 <div className="grid grid-cols-2 gap-4">
                   {/* Monthly */}
-                  <div className="p-5 rounded-xl border border-gray-700 bg-gray-950 flex flex-col">
-                    <p className="text-xs text-gray-500 uppercase tracking-widest mb-3">Monthly</p>
+                  <div className="p-5 rounded-xl flex flex-col" style={{ border: `1px solid ${BORDER}`, backgroundColor: SURF2 }}>
+                    <p className="text-xs uppercase tracking-widest mb-3" style={{ color: BROWN3 }}>Monthly</p>
                     <div className="mb-1">
-                      <span className="text-2xl font-bold text-white">$9.99</span>
-                      <span className="text-gray-500 text-xs"> /mo</span>
+                      <span className="text-2xl font-semibold" style={{ color: BROWN, fontFamily: "'Instrument Sans', sans-serif" }}>$9.99</span>
+                      <span className="text-xs" style={{ color: BROWN3 }}> /mo</span>
                     </div>
-                    <p className="text-gray-600 text-xs mb-5">Cancel anytime.</p>
+                    <p className="text-xs mb-5" style={{ color: BROWN3 }}>Cancel anytime.</p>
                     <button
                       onClick={() => { capture("plan_upgraded", { plan: "monthly" }); const link = getStripeLink("monthly", user); if (link) window.location.href = link; }}
-                      className="mt-auto w-full py-2.5 rounded-lg font-bold text-sm transition-all duration-150 active:scale-95 border"
-                      style={{ borderColor: "#6C63FF60", color: "#6C63FF", background: "none" }}
+                      className="mt-auto w-full py-2.5 rounded-lg font-semibold text-sm transition-all duration-150 active:scale-95"
+                      style={{ border: `1px solid ${ORANGE}60`, color: ORANGE, background: "none" }}
                     >
                       Upgrade Monthly ↗
                     </button>
                   </div>
 
                   {/* Lifetime */}
-                  <div className="p-5 rounded-xl flex flex-col relative overflow-hidden" style={{ border: "2px solid #6C63FF", background: "linear-gradient(135deg, #6C63FF12, #0F0F23)" }}>
-                    <div className="absolute top-3 right-3 text-xs font-bold px-2 py-0.5 rounded-full" style={{ backgroundColor: "#6C63FF", color: "white" }}>
+                  <div className="p-5 rounded-xl flex flex-col relative overflow-hidden" style={{ border: `2px solid ${ORANGE}`, background: `linear-gradient(135deg, ${ORANGE}10, ${BG})` }}>
+                    <div className="absolute top-3 right-3 text-xs font-semibold px-2 py-0.5 rounded-full text-white" style={{ backgroundColor: ORANGE }}>
                       Best value
                     </div>
-                    <p className="text-xs uppercase tracking-widest mb-3" style={{ color: "#6C63FF" }}>Lifetime</p>
+                    <p className="text-xs uppercase tracking-widest mb-3" style={{ color: ORANGE }}>Lifetime</p>
                     <div className="mb-1">
-                      <span className="text-2xl font-bold text-white">$49.99</span>
+                      <span className="text-2xl font-semibold" style={{ color: BROWN, fontFamily: "'Instrument Sans', sans-serif" }}>$49.99</span>
                     </div>
-                    <p className="text-gray-400 text-xs mb-5">One-time. Forever.</p>
+                    <p className="text-xs mb-5" style={{ color: BROWN3 }}>One-time. Forever.</p>
                     <button
                       onClick={() => { capture("plan_upgraded", { plan: "lifetime" }); const link = getStripeLink("lifetime", user); if (link) window.location.href = link; }}
-                      className="mt-auto w-full py-2.5 rounded-lg font-bold text-sm text-white transition-all duration-150 active:scale-95"
-                      style={{ backgroundColor: "#6C63FF" }}
+                      className="mt-auto w-full py-2.5 rounded-lg font-semibold text-sm text-white transition-all duration-150 active:scale-95"
+                      style={{ background: `linear-gradient(135deg, ${ORANGE}, ${AMBER})` }}
                     >
                       Get Lifetime ↗
                     </button>
                   </div>
                 </div>
 
-                <p className="text-center text-xs text-gray-700 mt-5">
+                <p className="text-center text-xs mt-5" style={{ color: BROWN3 }}>
                   Secure checkout via Stripe. Cancel monthly anytime.
                 </p>
               </>
