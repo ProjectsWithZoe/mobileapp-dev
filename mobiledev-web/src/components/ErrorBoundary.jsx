@@ -1,3 +1,5 @@
+'use client'
+
 import { Component } from "react";
 import { Sentry } from "../lib/sentry";
 

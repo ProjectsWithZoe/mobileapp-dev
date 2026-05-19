@@ -1,19 +1,21 @@
 import * as Sentry from '@sentry/react'
 
-const dsn = import.meta.env.VITE_SENTRY_DSN
+const dsn = process.env.NEXT_PUBLIC_SENTRY_DSN
 
 export const isSentryConfigured = Boolean(dsn)
 
-if (dsn) {
+// Guard against server-side execution — @sentry/react is browser-only.
+// SentryInit.jsx imports this file as a 'use client' component so this
+// block only runs in the browser, but the guard keeps it safe if the
+// module is accidentally evaluated server-side.
+if (dsn && typeof window !== 'undefined') {
   Sentry.init({
     dsn,
-    environment: import.meta.env.MODE,   // "development" | "production"
+    environment: process.env.NODE_ENV,
     integrations: [
-      Sentry.browserTracingIntegration(), // performance traces (page loads, navigation)
+      Sentry.browserTracingIntegration(),
     ],
-    // Capture all traces in dev so you can inspect them immediately;
-    // dial back to 20% in production to stay inside the free-tier quota.
-    tracesSampleRate: import.meta.env.PROD ? 0.2 : 1.0,
+    tracesSampleRate: process.env.NODE_ENV === 'production' ? 0.2 : 1.0,
   })
 }
 

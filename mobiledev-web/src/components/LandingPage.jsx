@@ -1,3 +1,5 @@
+'use client'
+
 import { useState } from "react";
 import { track } from "@vercel/analytics";
 import {
@@ -25,86 +27,191 @@ const SURF    = "#FFFFFF";   // card surface
 const SURF2   = "#FFF5EC";   // alternate section tint
 const BORDER  = "#E8CFBA";   // warm border
 
+const BLOG_URL = "/blog";
+
 // ─── DATA ────────────────────────────────────────────────────────────────────
 
 const APP_TYPES = [
   {
     id: "mobile", label: "Mobile App", Icon: Smartphone,
     prompt:
-`SCREENS: Home (weekly summary + streak), Activity (run history, pace charts), Live Tracker (GPS map, real-time stats), Profile (achievements, goals)
+`Build a complete Next.js 14+ App Router project for a fitness tracking app.
+
+FRAMEWORK: Next.js 14 App Router · TypeScript · Tailwind CSS · shadcn/ui · Recharts
+
+ROUTES & FILES:
+  app/layout.tsx          — root layout, metadata, fonts (Inter)
+  app/page.tsx            — redirects to /home
+  app/(app)/layout.tsx    — mobile shell with bottom tab nav
+  app/(app)/home/page.tsx — weekly summary card, current streak badge, daily ring progress
+  app/(app)/activity/page.tsx — run history list, pace/distance line chart (Recharts)
+  app/(app)/tracker/page.tsx  — live stats grid (pace, distance, time, BPM), map placeholder
+  app/(app)/profile/page.tsx  — avatar, achievements grid, goals progress bars
+  components/ui/            — shadcn/ui primitives (Card, Badge, Progress, Button)
+  components/BottomNav.tsx  — 'use client' tab bar with active state
+  components/StatCard.tsx   — reusable KPI card
+  lib/mock-data.ts          — realistic inline mock data (no TODOs)
+  package.json              — all deps listed
 
 PALETTE: Midnight — bg #0D0D1A · surface #111128 · accent #6C63FF · highlight #FF6584
 
-STACK: React Native, Expo, Recharts
-
-COMPONENTS: Bottom tab nav, glassmorphic cards, streak badge, animated progress bars, avatar ring
-
-STYLE: Mobile-first · 8px radius system · Inter · smooth transitions`,
+RULES:
+  - Server Components by default; 'use client' only on BottomNav, charts, interactive state
+  - TypeScript interfaces for all data shapes
+  - Tailwind for all styling; no inline styles
+  - Populate every screen with realistic mock data — no placeholder text
+  - Mobile viewport (max-w-sm mx-auto) with 8px radius system`,
   },
   {
     id: "dashboard", label: "Dashboard", Icon: Monitor,
     prompt:
-`SCREENS: Overview (KPI cards, revenue chart, user growth), Users (table + detail drawer), Reports (date picker, export), Settings
+`Build a complete Next.js 14+ App Router project for an analytics dashboard.
+
+FRAMEWORK: Next.js 14 App Router · TypeScript · Tailwind CSS · shadcn/ui · Recharts
+
+ROUTES & FILES:
+  app/layout.tsx               — root layout, metadata, Inter font
+  app/page.tsx                 — redirects to /overview
+  app/(dashboard)/layout.tsx   — collapsible sidebar shell
+  app/(dashboard)/overview/page.tsx — KPI cards, revenue line chart, user growth area chart
+  app/(dashboard)/users/page.tsx    — paginated data table, row click → detail sheet
+  app/(dashboard)/reports/page.tsx  — date range picker, bar chart, CSV export button
+  app/(dashboard)/settings/page.tsx — profile form, notification toggles
+  components/Sidebar.tsx       — 'use client' collapsible nav with active route highlight
+  components/KpiCard.tsx       — stat + trend badge + sparkline
+  components/DataTable.tsx     — 'use client' sortable, paginated table
+  components/charts/           — RevenueChart.tsx, UserGrowthChart.tsx (Recharts, 'use client')
+  lib/mock-data.ts             — 90 days of time-series data, 50 user rows
+  package.json                 — all deps listed
 
 PALETTE: Slate — bg #0A0A12 · surface #111120 · accent #6C63FF · text #E2E8F0
 
-STACK: React, Recharts, Tailwind CSS
-
-COMPONENTS: Collapsible sidebar, metric cards, line/bar/donut charts, paginated data table, date range picker
-
-STYLE: Desktop-first · 6px radius · clean grid layout · smooth hover transitions`,
+RULES:
+  - Server Components for page shells and data; 'use client' on charts, sidebar, table interactions
+  - TypeScript interfaces for all data shapes
+  - Tailwind only; no inline styles
+  - Every chart populated with realistic numeric mock data
+  - Desktop-first responsive layout with collapsible sidebar (64px collapsed / 240px expanded)`,
   },
   {
     id: "landing", label: "Landing Page", Icon: Globe,
     prompt:
-`SECTIONS: Nav (logo, links, CTA), Hero (headline, sub, screenshot), Features (3-col icon grid), Pricing (2-tier cards), Testimonials, CTA band, Footer
+`Build a complete Next.js 14+ App Router project for a SaaS marketing landing page.
+
+FRAMEWORK: Next.js 14 App Router · TypeScript · Tailwind CSS · shadcn/ui · Framer Motion
+
+ROUTES & FILES:
+  app/layout.tsx   — root layout, metadata (OG tags, description), Inter + display font
+  app/page.tsx     — assembles all sections as a Server Component
+  components/Nav.tsx          — 'use client' sticky blurred nav, mobile hamburger menu
+  components/Hero.tsx         — gradient headline, sub-copy, CTA buttons, product screenshot
+  components/Features.tsx     — 3-column icon grid, each card has title + body
+  components/Pricing.tsx      — 'use client' monthly/annual toggle, 2-tier cards with feature lists
+  components/Testimonials.tsx — avatar + quote cards in a horizontal scroll strip
+  components/CtaBand.tsx      — dark gradient band with headline + button
+  components/Footer.tsx       — logo, nav links, social icons, legal links
+  lib/content.ts              — all copy, feature list, pricing tiers, testimonials as typed constants
+  package.json                — all deps listed
 
 PALETTE: Ocean — bg #0A0F1E · surface #0D1628 · accent #3B82F6 · secondary #60A5FA
 
-STACK: React, Framer Motion, Tailwind
-
-COMPONENTS: Sticky blurred nav, gradient hero text, feature icon cards, pricing toggle, testimonial cards with avatars
-
-STYLE: Fully responsive · scroll-triggered animations · gradient accents`,
+RULES:
+  - Server Components for all static sections; 'use client' only on Nav (mobile menu) and Pricing (toggle)
+  - Framer Motion scroll-triggered fade-up on Features and Testimonials
+  - TypeScript interfaces for all content types
+  - Fully responsive (mobile → desktop); sticky blurred nav with backdrop-filter
+  - No placeholder copy — write real compelling SaaS marketing text throughout`,
   },
   {
     id: "saas", label: "SaaS App", Icon: Zap,
     prompt:
-`SCREENS: Dashboard (project overview, activity), Kanban (drag-drop: Todo / In Progress / Review / Done), Team (members, roles, invite modal), Settings
+`Build a complete Next.js 14+ App Router project for a project management SaaS app.
+
+FRAMEWORK: Next.js 14 App Router · TypeScript · Tailwind CSS · shadcn/ui · @dnd-kit/core
+
+ROUTES & FILES:
+  app/layout.tsx                — root layout, metadata, Inter font
+  app/page.tsx                  — redirects to /dashboard
+  app/(app)/layout.tsx          — collapsible app shell with top nav + sidebar
+  app/(app)/dashboard/page.tsx  — project overview cards, recent activity feed, completion stats
+  app/(app)/board/page.tsx      — 'use client' kanban with 4 columns, drag-drop via @dnd-kit
+  app/(app)/team/page.tsx       — member list with roles, invite modal (shadcn/ui Dialog)
+  app/(app)/settings/page.tsx   — workspace settings form, danger zone
+  components/AppShell.tsx       — 'use client' sidebar collapse, notification bell popover
+  components/KanbanBoard.tsx    — 'use client' DndContext, SortableContext, card drag-drop
+  components/KanbanCard.tsx     — tag chips, priority dot, assignee avatar, due date
+  components/InviteModal.tsx    — 'use client' Dialog with email input + role select
+  lib/mock-data.ts              — 3 projects, 20 kanban cards with realistic titles and assignees
+  package.json                  — all deps listed
 
 PALETTE: Forest — bg #0A1409 · surface #0F1C0E · accent #4ADE80 · secondary #22C55E
 
-STACK: React, @dnd-kit, Tailwind
-
-COMPONENTS: Collapsible app shell, kanban cards with tags + priority, modal system, notification bell, status badge system
-
-STYLE: Dense information layout · compact spacing · smooth drag animations`,
+RULES:
+  - Server Components for page shells; 'use client' on KanbanBoard, AppShell, modals
+  - TypeScript interfaces: Project, Card, Member, Column
+  - Kanban state managed with useState; optimistic drag updates
+  - Dense compact layout; 4px radius system; Inter font at 13–14px body
+  - All columns pre-populated with 4–6 realistic cards`,
   },
   {
     id: "ecommerce", label: "E-commerce", Icon: ShoppingBag,
     prompt:
-`SCREENS: Home (hero banner, featured grid), Product (gallery, size picker, add-to-cart), Cart (items, order summary, checkout), Wishlist
+`Build a complete Next.js 14+ App Router project for a fashion e-commerce store.
+
+FRAMEWORK: Next.js 14 App Router · TypeScript · Tailwind CSS · shadcn/ui · Zustand
+
+ROUTES & FILES:
+  app/layout.tsx               — root layout, metadata, cart provider wrapper
+  app/page.tsx                 — home: hero banner + featured product grid (Server Component)
+  app/products/[slug]/page.tsx — product detail: image gallery, size pills, add-to-cart, description
+  app/cart/page.tsx            — line items list, order summary, proceed to checkout button
+  app/wishlist/page.tsx        — saved items grid
+  components/Header.tsx        — 'use client' nav with cart icon + item count badge
+  components/ProductCard.tsx   — image, name, price, quick-add button
+  components/SizeSelector.tsx  — 'use client' pill group with selected state
+  components/CartDrawer.tsx    — 'use client' slide-out Sheet (shadcn) with line items
+  components/ImageGallery.tsx  — 'use client' thumbnail strip + main image zoom
+  store/cart.ts                — Zustand store: items, addItem, removeItem, updateQty, total
+  lib/mock-data.ts             — 12 products with name, price, sizes, image URLs (unsplash), slug
+  package.json                 — all deps listed
 
 PALETTE: Ember — bg #0F0A07 · surface #1A100A · accent #F97316 · secondary #FB923C
 
-STACK: React, Tailwind, Zustand for cart state
-
-COMPONENTS: Full-bleed hero, product card with quick-add, size selector pills, slide-out cart drawer, image zoom gallery
-
-STYLE: Bold product-first layout · orange accents · smooth cart animations`,
+RULES:
+  - Server Components for home and product pages (async data fetch from mock-data)
+  - 'use client' on Header, SizeSelector, CartDrawer, ImageGallery
+  - Cart state via Zustand; persisted to localStorage with zustand/middleware persist
+  - TypeScript interfaces: Product, CartItem, Size
+  - Fully responsive product grid (1 → 2 → 4 cols); bold product-first visual hierarchy`,
   },
   {
     id: "portfolio", label: "Portfolio", Icon: Briefcase,
     prompt:
-`SECTIONS: Nav, Hero (name, role, tagline, CTA), Work (project grid with hover preview), About (bio, skills grid, timeline), Contact (form + social links)
+`Build a complete Next.js 14+ App Router project for a creative developer portfolio.
+
+FRAMEWORK: Next.js 14 App Router · TypeScript · Tailwind CSS · shadcn/ui · Framer Motion
+
+ROUTES & FILES:
+  app/layout.tsx         — root layout, metadata (name, OG image), Inter + display font
+  app/page.tsx           — single-page scroll: Hero, Work, About, Contact sections
+  components/Nav.tsx     — 'use client' sticky nav with scroll-spy active link highlight
+  components/Hero.tsx    — animated name reveal, role typewriter, CTA buttons, scroll indicator
+  components/Work.tsx    — project grid; each card has title, tags, description, live/github links
+  components/About.tsx   — bio paragraph, skill badge grid, vertical timeline (3 career entries)
+  components/Contact.tsx — 'use client' form (name, email, message) with validation + send state
+  components/ProjectCard.tsx — tilt-on-hover effect, tag chips, overlay with links on hover
+  components/Timeline.tsx    — year + role + company + description list
+  lib/content.ts         — projects array, skills list, timeline entries, social links as typed constants
+  package.json           — all deps listed
 
 PALETTE: Blush — bg #0F0A0D · surface #1A0F16 · accent #EC4899 · secondary #F472B6
 
-STACK: React, GSAP, Tailwind
-
-COMPONENTS: Animated hero text, tilt-effect project cards, skill badge grid, timeline component, floating-label contact form
-
-STYLE: Creative · animation-forward · smooth page transitions`,
+RULES:
+  - Server Components for page and static sections; 'use client' on Nav, Contact form, ProjectCard tilt
+  - Framer Motion: staggered fade-up on Work grid, scroll-triggered reveal on About and Timeline
+  - TypeScript interfaces: Project, Skill, TimelineEntry
+  - Contact form validates all fields client-side before submit; shows success state
+  - Populate with realistic developer profile data — 4 projects, 12 skills, 3 timeline entries`,
   },
 ];
 
@@ -191,10 +298,9 @@ export default function LandingPage({ onSignIn, onSubscribe, onDemo }) {
     if (!contactForm.name.trim() || !contactForm.email.trim() || !contactForm.message.trim()) return;
     setContactStatus("sending");
     try {
-      const anonKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_DEFAULT_KEY
-        ?? import.meta.env.VITE_SUPABASE_ANON_KEY;
+      const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
       const res = await fetch(
-        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/send-contact`,
+        `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/send-contact`,
         {
           method: "POST",
           headers: {
@@ -287,6 +393,11 @@ export default function LandingPage({ onSignIn, onSubscribe, onDemo }) {
           </div>
 
           <div className="flex items-center gap-3">
+            <a
+              href={BLOG_URL}
+              className="hidden sm:block text-xs transition-colors"
+              style={{ color: BROWN3, textDecoration: "none", opacity: 0.8 }}
+            >Blog</a>
             <button
               onClick={() => { setContactForm({ name: "", email: "", message: "" }); setContactStatus("idle"); setShowContact(true); }}
               className="hidden sm:block text-xs transition-colors"

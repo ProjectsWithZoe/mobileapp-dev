@@ -2,20 +2,17 @@ import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '../lib/supabase'
 
 export function useAuth() {
-  const [user, setUser] = useState(null)
+  const [user, setUser]       = useState(null)
   const [loading, setLoading] = useState(Boolean(supabase))
 
   useEffect(() => {
-    // When Supabase is not configured, stay signed out silently
     if (!supabase) return
 
-    // Hydrate from existing session on mount
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null)
       setLoading(false)
     })
 
-    // Keep state in sync with Supabase auth events
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null)
       setLoading(false)
@@ -24,15 +21,18 @@ export function useAuth() {
     return () => subscription.unsubscribe()
   }, [])
 
-  // signIn: shouldCreateUser:false means Supabase errors if the email has no account,
-  // preventing accidental account creation via the sign-in form.
-  const appUrl = import.meta.env.VITE_APP_URL || window.location.origin
+  // NEXT_PUBLIC_APP_URL is set at build time; fall back to origin at runtime.
+  const getAppUrl = () =>
+    process.env.NEXT_PUBLIC_APP_URL ||
+    (typeof window !== 'undefined' ? window.location.origin : 'https://humble-ui.com')
 
+  // signIn: shouldCreateUser:false errors if the email has no account,
+  // preventing accidental account creation via the sign-in form.
   const signIn = useCallback(async (email) => {
     if (!supabase) throw new Error('Auth is not configured.')
     const { error } = await supabase.auth.signInWithOtp({
       email,
-      options: { emailRedirectTo: appUrl, shouldCreateUser: false },
+      options: { emailRedirectTo: getAppUrl(), shouldCreateUser: false },
     })
     if (error) throw new Error('No account found for this email. Please sign up first using the Free Demo button.')
   }, [])
@@ -46,7 +46,7 @@ export function useAuth() {
 
     const { error } = await supabase.auth.signInWithOtp({
       email,
-      options: { emailRedirectTo: appUrl, shouldCreateUser: true },
+      options: { emailRedirectTo: getAppUrl(), shouldCreateUser: true },
     })
     if (error) throw error
   }, [])

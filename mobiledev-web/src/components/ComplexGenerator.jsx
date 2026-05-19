@@ -1,3 +1,5 @@
+'use client'
+
 import { useState, useCallback, useRef, useEffect } from "react";
 import { useAuth } from "../hooks/useAuth";
 import { useSavedPrompts } from "../hooks/useSavedPrompts";
@@ -31,15 +33,12 @@ const USE_CASES = [
   { id: "ecommerce", label: "🛍️ E-Commerce",    icon: "🛍️", desc: "Product & checkout flows" },
 ];
 
-const COLOR_PALETTES = [
-  { name: "Midnight", colors: ["#0F0F23", "#6C63FF", "#FF6584"], desc: "Electric violet + coral" },
-  { name: "Forest",   colors: ["#1A2F23", "#4CAF7D", "#F5C842"], desc: "Mint green + golden yellow" },
-  { name: "Ember",    colors: ["#1C1410", "#E85D04", "#FFBA08"], desc: "Burnt orange + amber" },
-  { name: "Ocean",    colors: ["#03045E", "#0096C7", "#ADE8F4"], desc: "Ocean blue + sky teal" },
-  { name: "Blush",    colors: ["#2D1B2E", "#E040FB", "#F8BBD9"], desc: "Neon magenta + soft pink" },
-  { name: "Slate",    colors: ["#0D1117", "#58A6FF", "#3FB950"], desc: "Electric blue + neon green" },
-  { name: "Sunset",   colors: ["#1A0A00", "#FF6B35", "#FFE66D"], desc: "Sunset orange + lemon" },
-  { name: "Arctic",   colors: ["#0A1628", "#00D4FF", "#B8FFF9"], desc: "Ice blue + crystal teal" },
+const isValidHex = (v) => /^#[0-9A-Fa-f]{6}$/.test(v);
+
+const COLOR_SLOTS = [
+  { label: "Background", hint: "Dark base — page & card bg" },
+  { label: "Primary",    hint: "CTAs, active states, key highlights" },
+  { label: "Accent",     hint: "Badges, secondary highlights" },
 ];
 
 const COMPLEXITY_LEVELS = [
@@ -135,26 +134,20 @@ const STYLE_TOKENS_BY_USECASE = {
   ],
 };
 
-const TECH_OPTIONS = [
-  { id: "react-tailwind", label: "React + Tailwind", default: true },
-  { id: "react-css",      label: "React + CSS Modules" },
-  { id: "html-vanilla",   label: "HTML + Vanilla JS" },
-  { id: "nextjs",         label: "Next.js + Tailwind" },
-];
-
 // ─── PROMPT BUILDERS ─────────────────────────────────────────────────────────
 
-const buildMobilePrompt = ({ appIdea, palette, styles, complexity, techStack, extraContext }) => `
-You are a senior React mobile developer with 10+ years of experience shipping production apps. Your code is architecturally clean, performant at 60fps, and visually indistinguishable from a professionally designed native app.
+const buildMobilePrompt = ({ appIdea, palette, styles, complexity, extraContext }) => `
+You are a senior Next.js developer with 10+ years of experience shipping production apps. Your code is architecturally clean, performant, and visually indistinguishable from a professionally designed native app.
 
 ## Task
-Build a **complete, fully functional ${appIdea}** as a single self-contained React JSX file with ${complexity.screens} screens. Every screen must feel like it shipped from a real product team.
+Build a **complete, fully functional ${appIdea}** as a Next.js App Router project with ${complexity.screens} screens. Every screen must feel like it shipped from a real product team.
 
 ## Tech Stack
-- **React** with hooks: useState, useEffect, useCallback, useMemo, useRef
-- **Tailwind CSS** utility classes only
+- **Next.js 15** App Router — \`app/\` directory, Server and Client Components
+- **Tailwind CSS v4** utility classes only
 - **Lucide React** icons
-- All data hardcoded/mocked — no fetch, no APIs
+- All data hardcoded/mocked — no external APIs
+- \`'use client'\` directive on any component using hooks or browser APIs
 ${extraContext ? `\n## Additional Context\n${extraContext}\n` : ""}
 ## Color Palette — "${palette.name}"
 | Token | Hex | Usage |
@@ -182,29 +175,38 @@ ${styles.map((s, i) => `${i + 1}. ${s}`).join("\n")}
 - ${complexity.screens} navigable screens via bottom nav
 - Realistic mock data (real names, plausible numbers, actual dates)
 - Micro-interactions: \`active:scale-95 transition-all duration-150\` on every tappable element
-- At least one skeleton/loading state with useEffect + setTimeout
+- At least one skeleton/loading state
 - At least one bottom sheet or modal pattern
 
-## Component Architecture
-1. Imports → 2. Constants & mock data → 3. Atomic sub-components → 4. Screen components → 5. Layout components → 6. Default export App
+## File Structure
+\`\`\`
+app/
+  layout.tsx       # Root layout with font and metadata
+  page.tsx         # Home screen (Server Component)
+  globals.css      # @import "tailwindcss"; minimal resets
+  [screen]/
+    page.tsx       # Each additional screen
+components/        # Shared UI components (\`'use client'\` where needed)
+\`\`\`
 
 ## Output Format
-Return **only** the complete JSX. No markdown fences, no explanation.
-Begin directly with \`import { useState, ... } from 'react'\`.
+Return **only** the complete file tree with each file's full contents. No markdown fences around the overall response.
+Start each file with a comment: \`// app/page.tsx\`, \`// components/BottomNav.tsx\`, etc.
 `.trim();
 
 const buildDashboardPrompt = ({ appIdea, palette, styles, complexity, extraContext }) => `
-You are a senior frontend engineer specializing in data-dense admin interfaces. You ship dashboards that are both beautiful and functional, where every pixel earns its place.
+You are a senior Next.js engineer specializing in data-dense admin interfaces. You ship dashboards that are both beautiful and functional, where every pixel earns its place.
 
 ## Task
-Build a **complete ${appIdea} dashboard** as a single self-contained React JSX file with ${complexity.screens} main views. Data should tell a story — not just fill a grid.
+Build a **complete ${appIdea} dashboard** as a Next.js App Router project with ${complexity.screens} main views. Data should tell a story — not just fill a grid.
 
 ## Tech Stack
-- React with hooks: useState, useEffect, useCallback, useMemo
-- Tailwind CSS utility classes only
-- Lucide React icons
+- **Next.js 15** App Router — \`app/\` directory, Server and Client Components
+- **Tailwind CSS v4** utility classes only
+- **Lucide React** icons
 - All data hardcoded/mocked with realistic variance and trends
-- Recharts for any charts: \`import { AreaChart, BarChart, ... } from 'recharts'\`
+- Recharts for charts: \`'use client'\` components only
+- \`'use client'\` directive on any component using hooks or browser APIs
 ${extraContext ? `\n## Additional Context\n${extraContext}\n` : ""}
 ## Color Palette — "${palette.name}"
 - Background: \`${palette.colors[0]}\` — page background, card bases
@@ -227,22 +229,34 @@ ${styles.map((s, i) => `${i + 1}. ${s}`).join("\n")}
 - ${complexity.screens} views switchable via sidebar nav
 - Realistic mock data: revenue figures, user counts, dates, percentages
 
+## File Structure
+\`\`\`
+app/
+  layout.tsx         # Root layout with metadata
+  page.tsx           # Dashboard home (Server Component)
+  globals.css        # @import "tailwindcss"; minimal resets
+  [view]/page.tsx    # Each additional view
+components/          # Sidebar, TopBar, KPICard, DataTable, Charts (\`'use client'\`)
+lib/data.ts          # Hardcoded mock data
+\`\`\`
+
 ## Output Format
-Return **only** the complete JSX. No markdown fences, no explanation.
-Begin with \`import { useState, ... } from 'react'\`.
+Return **only** the complete file tree with each file's full contents.
+Start each file with a comment: \`// app/page.tsx\`, \`// components/Sidebar.tsx\`, etc.
 `.trim();
 
 const buildLandingPrompt = ({ appIdea, palette, styles, complexity, extraContext }) => `
-You are a senior conversion-focused frontend developer. You build landing pages that look like they were designed by a top-tier agency and convert at industry-leading rates.
+You are a senior conversion-focused Next.js developer. You build landing pages that look like they were designed by a top-tier agency and convert at industry-leading rates.
 
 ## Task
-Build a **complete landing page for ${appIdea}** as a single self-contained React JSX file. Every section must earn its place — no filler, no generic content.
+Build a **complete landing page for ${appIdea}** as a Next.js App Router project. Every section must earn its place — no filler, no generic content.
 
 ## Tech Stack
-- React with hooks
-- Tailwind CSS utility classes only
-- Lucide React icons
+- **Next.js 15** App Router — \`app/\` directory, Server and Client Components
+- **Tailwind CSS v4** utility classes only
+- **Lucide React** icons
 - All copy and data hardcoded with genuine, compelling product copy
+- \`'use client'\` only where interactivity is needed (accordion, sticky nav scroll state)
 ${extraContext ? `\n## Additional Context\n${extraContext}\n` : ""}
 ## Color Palette — "${palette.name}"
 - Background: \`${palette.colors[0]}\`
@@ -266,22 +280,37 @@ Hero gradient: \`style={{ background: 'linear-gradient(135deg, ${palette.colors[
 ## Visual Language
 ${styles.map((s, i) => `${i + 1}. ${s}`).join("\n")}
 
+## File Structure
+\`\`\`
+app/
+  layout.tsx          # Root layout with metadata and fonts
+  page.tsx            # Server Component — composes all sections
+  globals.css         # @import "tailwindcss"; minimal resets
+components/
+  Nav.tsx             # \`'use client'\` — sticky scroll state
+  Hero.tsx            # Server Component
+  FAQ.tsx             # \`'use client'\` — accordion state
+  Pricing.tsx         # Server Component
+  Footer.tsx          # Server Component
+\`\`\`
+
 ## Output Format
-Return **only** the complete JSX. No markdown fences, no explanation.
-Begin with \`import { useState, ... } from 'react'\`.
+Return **only** the complete file tree with each file's full contents.
+Start each file with a comment: \`// app/page.tsx\`, \`// components/Nav.tsx\`, etc.
 `.trim();
 
 const buildSaaSPrompt = ({ appIdea, palette, styles, complexity, extraContext }) => `
-You are a principal engineer who has shipped multiple successful SaaS products. You build interfaces that feel like a polished B2B tool — professional, efficient, and delightfully usable.
+You are a principal Next.js engineer who has shipped multiple successful SaaS products. You build interfaces that feel like a polished B2B tool — professional, efficient, and delightfully usable.
 
 ## Task
-Build a **complete ${appIdea} SaaS application** as a single self-contained React JSX file with ${complexity.screens} sections/views. Think Notion, Linear, or Vercel — clean, purposeful, with a clear information hierarchy.
+Build a **complete ${appIdea} SaaS application** as a Next.js App Router project with ${complexity.screens} sections/views. Think Notion, Linear, or Vercel — clean, purposeful, with a clear information hierarchy.
 
 ## Tech Stack
-- React with hooks: useState, useEffect, useCallback, useMemo, useRef
-- Tailwind CSS utility classes only
-- Lucide React icons
+- **Next.js 15** App Router — \`app/\` directory, Server and Client Components
+- **Tailwind CSS v4** utility classes only
+- **Lucide React** icons
 - All data hardcoded/mocked
+- \`'use client'\` directive on any component using hooks or browser APIs
 ${extraContext ? `\n## Additional Context\n${extraContext}\n` : ""}
 ## Color Palette — "${palette.name}"
 - Background: \`${palette.colors[0]}\`
@@ -303,22 +332,39 @@ ${styles.map((s, i) => `${i + 1}. ${s}`).join("\n")}
 - Notification toast system (auto-dismiss after 3s)
 - ${complexity.screens} distinct views via sidebar nav
 
+## File Structure
+\`\`\`
+app/
+  layout.tsx              # Root layout — app shell (sidebar + top bar)
+  page.tsx                # Default view (Server Component)
+  globals.css             # @import "tailwindcss"; minimal resets
+  [view]/page.tsx         # Each additional view
+components/
+  Sidebar.tsx             # \`'use client'\` — nav state
+  TopBar.tsx              # \`'use client'\` — search, dropdown
+  Modal.tsx               # \`'use client'\` — dialog state
+  Toast.tsx               # \`'use client'\` — auto-dismiss toasts
+lib/data.ts               # Hardcoded mock data
+\`\`\`
+
 ## Output Format
-Return **only** the complete JSX. No markdown fences, no explanation.
-Begin with \`import { useState, ... } from 'react'\`.
+Return **only** the complete file tree with each file's full contents.
+Start each file with a comment: \`// app/page.tsx\`, \`// components/Sidebar.tsx\`, etc.
 `.trim();
 
 const buildPortfolioPrompt = ({ appIdea, palette, styles, complexity, extraContext }) => `
-You are a creative frontend developer known for portfolio sites that get people hired. You build personal sites that feel like art — memorable, fast, and deeply personal.
+You are a creative Next.js developer known for portfolio sites that get people hired. You build personal sites that feel like art — memorable, fast, and deeply personal.
 
 ## Task
-Build a **complete portfolio site for ${appIdea}** as a single self-contained React JSX file. It must feel handcrafted — like a designer built it, not a template generator.
+Build a **complete portfolio site for ${appIdea}** as a Next.js App Router project. It must feel handcrafted — like a designer built it, not a template generator.
 
 ## Tech Stack
-- React with hooks
-- Tailwind CSS utility classes only
-- Lucide React icons
+- **Next.js 15** App Router — \`app/\` directory, Server and Client Components
+- **Tailwind CSS v4** utility classes only
+- **Lucide React** icons
 - All content hardcoded with real-sounding names, titles, project descriptions
+- \`next/image\` for any images; \`next/font/google\` for typography
+- \`'use client'\` only where interactivity is needed (theme toggle, contact form)
 ${extraContext ? `\n## Additional Context\n${extraContext}\n` : ""}
 ## Color Palette — "${palette.name}"
 - Background: \`${palette.colors[0]}\`
@@ -335,22 +381,37 @@ ${extraContext ? `\n## Additional Context\n${extraContext}\n` : ""}
 ## Visual Language
 ${styles.map((s, i) => `${i + 1}. ${s}`).join("\n")}
 
+## File Structure
+\`\`\`
+app/
+  layout.tsx          # Root layout — fonts, metadata
+  page.tsx            # Server Component — composes all sections
+  globals.css         # @import "tailwindcss"; minimal resets
+components/
+  Hero.tsx            # Server Component
+  Projects.tsx        # Server Component
+  ContactForm.tsx     # \`'use client'\` — form state
+  ThemeToggle.tsx     # \`'use client'\` — dark/light state
+\`\`\`
+
 ## Output Format
-Return **only** the complete JSX. No markdown fences, no explanation.
-Begin with \`import { useState, ... } from 'react'\`.
+Return **only** the complete file tree with each file's full contents.
+Start each file with a comment: \`// app/page.tsx\`, \`// components/Hero.tsx\`, etc.
 `.trim();
 
 const buildEcommercePrompt = ({ appIdea, palette, styles, complexity, extraContext }) => `
-You are a senior e-commerce frontend engineer. You've built storefronts that convert. You know that every interaction — hover, add-to-cart, checkout — must feel effortless and trustworthy.
+You are a senior Next.js e-commerce engineer. You've built storefronts that convert. You know that every interaction — hover, add-to-cart, checkout — must feel effortless and trustworthy.
 
 ## Task
-Build a **complete ${appIdea} e-commerce UI** as a single self-contained React JSX file with ${complexity.screens} screens. Think Shopify + Apple Store aesthetics — premium, clean, conversion-optimized.
+Build a **complete ${appIdea} e-commerce UI** as a Next.js App Router project with ${complexity.screens} screens. Think Shopify + Apple Store aesthetics — premium, clean, conversion-optimized.
 
 ## Tech Stack
-- React with hooks: useState, useEffect, useCallback, useMemo
-- Tailwind CSS utility classes only
-- Lucide React icons
+- **Next.js 15** App Router — \`app/\` directory, Server and Client Components
+- **Tailwind CSS v4** utility classes only
+- **Lucide React** icons
 - All product data hardcoded/mocked (realistic product names, prices, descriptions)
+- \`next/image\` for product images
+- \`'use client'\` directive on any component using hooks or browser APIs
 ${extraContext ? `\n## Additional Context\n${extraContext}\n` : ""}
 ## Color Palette — "${palette.name}"
 - Background: \`${palette.colors[0]}\`
@@ -358,11 +419,11 @@ ${extraContext ? `\n## Additional Context\n${extraContext}\n` : ""}
 - Accent: \`${palette.colors[2]}\` — sale badges, wishlist, rating stars
 
 ## Required Screens
-1. Product listing/catalog with filter sidebar or top filter bar
-2. Product detail page: gallery, variant picker, add to cart
-3. Cart drawer or cart page with quantity controls + order summary
-${complexity.id !== "simple" ? "4. Simple checkout flow (shipping + payment form mockup)" : ""}
-${complexity.id === "advanced" ? "5. Order confirmation / thank you screen" : ""}
+1. Product listing/catalog with filter sidebar or top filter bar — \`app/page.tsx\`
+2. Product detail page: gallery, variant picker, add to cart — \`app/product/[id]/page.tsx\`
+3. Cart drawer or cart page with quantity controls + order summary — \`app/cart/page.tsx\`
+${complexity.id !== "simple" ? "4. Simple checkout flow (shipping + payment form mockup) — `app/checkout/page.tsx`" : ""}
+${complexity.id === "advanced" ? "5. Order confirmation / thank you screen — `app/order-confirmed/page.tsx`" : ""}
 
 ## Visual Language
 ${styles.map((s, i) => `${i + 1}. ${s}`).join("\n")}
@@ -373,9 +434,24 @@ ${styles.map((s, i) => `${i + 1}. ${s}`).join("\n")}
 - Toast notification on add to cart
 - Realistic product data: 8+ products with names, prices, ratings, stock status
 
+## File Structure
+\`\`\`
+app/
+  layout.tsx                  # Root layout — nav with cart badge
+  page.tsx                    # Product catalog (Server Component)
+  globals.css                 # @import "tailwindcss"; minimal resets
+  product/[id]/page.tsx       # Product detail (Server Component)
+  cart/page.tsx               # Cart page
+components/
+  CartDrawer.tsx              # \`'use client'\` — cart state
+  ProductCard.tsx             # \`'use client'\` — wishlist toggle
+  Toast.tsx                   # \`'use client'\` — add-to-cart feedback
+lib/products.ts               # Hardcoded product data
+\`\`\`
+
 ## Output Format
-Return **only** the complete JSX. No markdown fences, no explanation.
-Begin with \`import { useState, ... } from 'react'\`.
+Return **only** the complete file tree with each file's full contents.
+Start each file with a comment: \`// app/page.tsx\`, \`// components/CartDrawer.tsx\`, etc.
 `.trim();
 
 const PROMPT_BUILDERS = {
@@ -425,8 +501,9 @@ const DEMO_STORAGE_KEY = "humble-ui-demo-used";
 export default function PromptGenerator({ demoMode = false, onDemoSignUp, onExitDemo }) {
   const [appIdea, setAppIdea]                 = useState("");
   const [selectedUseCase, setSelectedUseCase] = useState("mobile");
-  const [selectedPalette, setSelectedPalette] = useState(0);
+  const [customPalette, setCustomPalette]     = useState({ name: "Custom", colors: ["#0D0D1A", "#6C63FF", "#FF6584"] });
   const [selectedComplexity, setSelectedComplexity] = useState("standard");
+  const colorRefs = useRef([]);
   const [extraContext, setExtraContext]        = useState("");
   const [showExtraContext, setShowExtraContext] = useState(false);
   const [generatedPrompt, setGeneratedPrompt] = useState("");
@@ -479,7 +556,7 @@ export default function PromptGenerator({ demoMode = false, onDemoSignUp, onExit
         name: saveName.trim(),
         app_idea: appIdea,
         use_case: selectedUseCase,
-        palette_index: selectedPalette,
+        palette_index: 0,
         complexity: selectedComplexity,
         extra_context: extraContext,
         prompt_text: generatedPrompt,
@@ -491,12 +568,11 @@ export default function PromptGenerator({ demoMode = false, onDemoSignUp, onExit
     } finally {
       setSaving(false);
     }
-  }, [saveName, appIdea, selectedUseCase, selectedPalette, selectedComplexity, extraContext, generatedPrompt, savePrompt]);
+  }, [saveName, appIdea, selectedUseCase, selectedComplexity, extraContext, generatedPrompt, savePrompt]);
 
   const handleLoad = useCallback((saved) => {
     setAppIdea(saved.app_idea);
     setSelectedUseCase(saved.use_case);
-    setSelectedPalette(saved.palette_index);
     setSelectedComplexity(saved.complexity);
     setExtraContext(saved.extra_context ?? "");
     setGeneratedPrompt(saved.prompt_text);
@@ -504,7 +580,12 @@ export default function PromptGenerator({ demoMode = false, onDemoSignUp, onExit
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, []);
 
-  const palette    = COLOR_PALETTES[selectedPalette];
+  const updateColor = useCallback((index, raw) => {
+    const value = raw.startsWith("#") ? raw : `#${raw}`;
+    setCustomPalette(p => { const colors = [...p.colors]; colors[index] = value; return { ...p, colors }; });
+  }, []);
+
+  const palette    = customPalette;
   const complexity = COMPLEXITY_LEVELS.find((c) => c.id === selectedComplexity);
   const styleTokens = STYLE_TOKENS_BY_USECASE[selectedUseCase] || STYLE_TOKENS_BY_USECASE.mobile;
   const canGenerate = appIdea.trim().length > 0;
@@ -723,36 +804,62 @@ export default function PromptGenerator({ demoMode = false, onDemoSignUp, onExit
             </div>
           </div>
 
-          {/* Step 4: Color Palette */}
+          {/* Step 4: Custom Color Palette */}
           <div>
             <StepLabel number="4" label="Color Palette" active={true} />
-            <div className="grid grid-cols-2 gap-2">
-              {COLOR_PALETTES.map((p, i) => (
-                <button
-                  key={p.name}
-                  onClick={() => setSelectedPalette(i)}
-                  className="flex items-center gap-3 p-3 rounded-xl text-left transition-all duration-150 active:scale-95"
-                  style={{
-                    border: `1px solid ${selectedPalette === i ? ORANGE : BORDER}`,
-                    backgroundColor: selectedPalette === i ? SURF2 : SURF,
-                  }}
-                >
-                  <div className="flex shrink-0">
-                    {p.colors.map((c, ci) => (
-                      <div
-                        key={c}
-                        className="w-3.5 h-3.5 rounded-full border-2"
-                        style={{ backgroundColor: c, borderColor: SURF, marginLeft: ci > 0 ? "-3px" : 0 }}
+            <div className="space-y-3">
+              {COLOR_SLOTS.map(({ label, hint }, index) => {
+                const value = customPalette.colors[index];
+                const valid = isValidHex(value);
+                return (
+                  <div key={label} className="flex items-center gap-3">
+                    <button
+                      onClick={() => colorRefs.current[index]?.click()}
+                      className="shrink-0 w-10 h-10 rounded-lg border-2 transition-all duration-150 active:scale-95"
+                      style={{
+                        backgroundColor: valid ? value : BORDER,
+                        borderColor: valid ? value : BORDER,
+                        boxShadow: valid ? `0 0 0 2px ${value}30` : "none",
+                      }}
+                    />
+                    <input
+                      ref={el => colorRefs.current[index] = el}
+                      type="color"
+                      value={valid ? value : "#000000"}
+                      onChange={(e) => updateColor(index, e.target.value)}
+                      className="sr-only"
+                    />
+                    <div className="flex-1 min-w-0">
+                      <div className="text-xs font-semibold mb-1" style={{ color: BROWN }}>{label}</div>
+                      <input
+                        type="text"
+                        value={value}
+                        onChange={(e) => updateColor(index, e.target.value)}
+                        placeholder="#000000"
+                        maxLength={7}
+                        spellCheck={false}
+                        className="w-full rounded-lg px-3 py-1.5 text-xs focus:outline-none transition-colors"
+                        style={{
+                          backgroundColor: SURF,
+                          border: `1px solid ${valid ? `${value}90` : BORDER}`,
+                          color: BROWN,
+                          fontFamily: "'IBM Plex Mono', monospace",
+                          colorScheme: "light",
+                        }}
                       />
-                    ))}
+                      <div className="text-xs mt-0.5" style={{ color: BROWN3 }}>{hint}</div>
+                    </div>
                   </div>
-                  <div>
-                    <div className="text-xs font-semibold" style={{ color: BROWN }}>{p.name}</div>
-                    <div className="text-xs leading-tight" style={{ color: BROWN3 }}>{p.desc}</div>
-                  </div>
-                </button>
-              ))}
+                );
+              })}
             </div>
+            {customPalette.colors.every(isValidHex) && (
+              <div className="mt-3 rounded-xl overflow-hidden flex h-6" style={{ border: `1px solid ${BORDER}` }}>
+                {customPalette.colors.map((c, i) => (
+                  <div key={i} className="flex-1" style={{ backgroundColor: c }} />
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Generate Button */}
@@ -870,7 +977,7 @@ export default function PromptGenerator({ demoMode = false, onDemoSignUp, onExit
                 Fill in the details on the left and hit Generate
               </p>
               <div className="mt-6 flex flex-col gap-1.5 text-left">
-                {["Use case → tailored style tokens", "Complexity → screen count", "Palette → exact hex colors", "Context → sharper output"].map((tip) => (
+                {["Use case → tailored style tokens", "Complexity → screen count", "Your hex codes → exact brand colors", "Context → sharper output"].map((tip) => (
                   <div key={tip} className="flex items-center gap-2 text-xs" style={{ color: BROWN3 }}>
                     <span style={{ color: ORANGE }}>→</span> {tip}
                   </div>

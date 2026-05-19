@@ -1,0 +1,30 @@
+{
+  "pages": {
+    "/page": [
+      "static/chunks/[root-of-the-server]__7ad20ae5._.css",
+      "static/chunks/8ba71_next_2655e6e6._.js",
+      "static/chunks/8ba71_@sentry_react_build_esm_db32881a._.js",
+      "static/chunks/8ba71_@sentry_browser_build_npm_esm_dev_4aa65b4f._.js",
+      "static/chunks/8ba71_@sentry_core_build_esm_d3a9f12f._.js",
+      "static/chunks/8ba71_@sentry-internal_browser-utils_build_esm_dc0a4c51._.js",
+      "static/chunks/8ba71_@sentry-internal_replay_build_npm_esm_index_c6ec1323.js",
+      "static/chunks/8ba71_0b1cb2c7._.js",
+      "static/chunks/mobiledev-web_src_084a382e._.js",
+      "static/chunks/mobiledev-web_app_layout_jsx_1db73f16._.js",
+      "static/chunks/8ba71_next_dist_client_components_builtin_global-error_c94a9f3f.js",
+      "static/chunks/mobiledev-web_src_components_e934dc84._.js",
+      "static/chunks/8ba71_70a2eb54._.js",
+      "static/chunks/mobiledev-web_9aa5b079._.js",
+      "static/chunks/mobiledev-web_app_page_jsx_c94a9f3f._.js",
+      "static/chunks/[turbopack]_browser_dev_hmr-client_hmr-client_ts_15e387c5._.js",
+      "static/chunks/8ba71_next_dist_compiled_react-dom_e1b4c3b4._.js",
+      "static/chunks/8ba71_next_dist_compiled_next-devtools_index_cba4bf6d.js",
+      "static/chunks/8ba71_next_dist_compiled_bf13a6db._.js",
+      "static/chunks/8ba71_next_dist_client_32f8acd7._.js",
+      "static/chunks/8ba71_next_dist_51d119c9._.js",
+      "static/chunks/8ba71_@swc_helpers_cjs_4a878a4d._.js",
+      "static/chunks/mobiledev-web_a0ff3932._.js",
+      "static/chunks/turbopack-mobiledev-web_8bed0344._.js"
+    ]
+  }
+}

@@ -1,7 +1,7 @@
 import posthog from 'posthog-js'
 
-const key  = import.meta.env.VITE_PUBLIC_POSTHOG_KEY
-const host = import.meta.env.VITE_PUBLIC_POSTHOG_HOST ?? 'https://us.i.posthog.com'
+const key  = process.env.NEXT_PUBLIC_POSTHOG_KEY
+const host = process.env.NEXT_PUBLIC_POSTHOG_HOST ?? 'https://us.i.posthog.com'
 
 export const isPostHogConfigured = Boolean(key)
 
