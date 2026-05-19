@@ -1,11 +1,14 @@
-import { createClient } from '@supabase/supabase-js'
+import { createBrowserClient } from "@supabase/ssr";
 
-const url = process.env.NEXT_PUBLIC_SUPABASE_URL
-const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-
-// When env vars are missing (e.g. no .env.local yet) export null so the app
-// loads without crashing — auth/save features simply stay hidden.
-export const supabase = url && key ? createClient(url, key) : null
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
 
 /** True only when both NEXT_PUBLIC_SUPABASE_* env vars are present. */
-export const isSupabaseConfigured = Boolean(url && key)
+export const isSupabaseConfigured = Boolean(supabaseUrl && supabaseKey);
+
+export const createClient = () =>
+  createBrowserClient(supabaseUrl, supabaseKey);
+
+// Singleton for client-side hooks. Null when env vars are absent (graceful degradation).
+export const supabase = isSupabaseConfigured ? createClient() : null;
+

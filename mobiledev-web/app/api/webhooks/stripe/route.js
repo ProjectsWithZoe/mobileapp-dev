@@ -80,7 +80,7 @@ export async function POST(req) {
 
     // Send magic-link OTP so the user can create an account
     const appUrl  = process.env.APP_URL ?? 'https://humble-ui.com'
-    const anonKey = process.env.SUPABASE_ANON_KEY ?? process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+    const anonKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ?? process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY
 
     if (!anonKey) {
       console.error('[stripe-webhook] Missing Supabase anon key — cannot send activation email')
