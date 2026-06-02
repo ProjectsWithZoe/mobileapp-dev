@@ -277,7 +277,7 @@ function PhoneMockup({ src, label, floatClass, offset, accent = ORANGE }) {
       >
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-16 h-4 rounded-b-2xl z-10"
           style={{ backgroundColor: "#f5ede4" }} />
-        <img src={src} alt={label} className="w-full block" />
+        <img src={typeof src === 'object' ? src.src : src} alt={label} className="w-full block" />
       </div>
       <span className="text-xs font-bold px-3 py-1 rounded-full"
         style={{ backgroundColor: `${accent}15`, color: accent }}>
