@@ -32,3 +32,5 @@ mobiledev-web/src/components/mobile-prompt-generator.jsx
 .env*.local
 ads-preview.html
 /openspec/
+.next
+mobiledev-web/.next
